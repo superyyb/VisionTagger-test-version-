@@ -76,7 +76,6 @@ public class Image {
   public String toString() {
     return String.format("Image[id=%s, uploader=%s, filePath=%s, timestamp=%s]",
         id, uploader, filePath, timestamp);
-
   }
 
   /**
@@ -101,6 +100,8 @@ public class Image {
   /**
    * Returns the hash code of this image. The hash code is based on the image ID, consistent with
    * equals().
+   *
+   * @return the hash code based on the image ID
    */
   @Override
   public int hashCode() {
