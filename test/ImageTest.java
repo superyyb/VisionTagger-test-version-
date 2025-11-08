@@ -67,18 +67,14 @@ public class ImageTest {
 
     /* Test equality and hash code consistency */
     @Test
-    void testEqualsWithSameId() {
+    void testEquals() {
         Image img1 = new Image(uploader, filePath, description);
-        int hashCode1 = img1.hashCode();
-        int hashCode3 = img1.hashCode();
         Image img2 = new Image(uploader, filePath, description);
-        int hashCode2 = img2.hashCode();
-
         assertNotEquals(img1, img2);
-        assertNotEquals(hashCode1, hashCode2);
+        assertNotEquals(img1.hashCode(), img2.hashCode());
 
         assertEquals(img1, img1);
-        assertEquals(hashCode1, hashCode3);
+        assertEquals(img1.hashCode(), img1.hashCode());
     }
 
     @Test
