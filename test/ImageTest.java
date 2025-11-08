@@ -1,0 +1,100 @@
+import model.Image;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDateTime;
+
+/**
+ * Unit tests for the Image model class.
+ */
+public class ImageTest {
+
+    private Image image;
+    private String uploader;
+    private String filePath;
+    private String description;
+
+    @BeforeEach
+    void setUp() {
+        uploader = "testuser";
+        filePath = "/path/to/image.jpg";
+        description = "Test image description";
+        image = new Image(uploader, filePath, description);
+    }
+
+    @Test
+    void testConstructorWithAllFields() {
+        assertNotNull(image);
+        assertEquals(uploader, image.getUploader());
+        assertEquals(filePath, image.getFilePath());
+        assertEquals(description, image.getDescription());
+        assertNotNull(image.getId());
+        assertNotNull(image.getUploadedAt());
+    }
+
+    @Test
+    void testConstructorWithNullDescription() {
+        Image img = new Image(uploader, filePath, null);
+        assertEquals("", img.getDescription());
+    }
+
+    @Test
+    void testConstructorGeneratesUniqueId() {
+        Image img1 = new Image(uploader, filePath, description);
+        Image img2 = new Image(uploader, filePath, description);
+        assertNotEquals(img1.getId(), img2.getId());
+    }
+
+    @Test
+    void testConstructorSetsUploadedAtTimestamp() {
+        LocalDateTime before = LocalDateTime.now();
+        Image img = new Image(uploader, filePath, description);
+        LocalDateTime after = LocalDateTime.now();
+        
+        assertTrue(img.getUploadedAt().isAfter(before.minusSeconds(1)));
+        assertTrue(img.getUploadedAt().isBefore(after.plusSeconds(1)));
+    }
+
+    @Test
+    void testGetters() {
+        assertEquals(uploader, image.getUploader());
+        assertEquals(filePath, image.getFilePath());
+        assertEquals(description, image.getDescription());
+        assertNotNull(image.getId());
+        assertNotNull(image.getUploadedAt());
+    }
+
+    /* Test equality and hash code consistency */
+    @Test
+    void testEqualsWithSameId() {
+        Image img1 = new Image(uploader, filePath, description);
+        int hashCode1 = img1.hashCode();
+        int hashCode3 = img1.hashCode();
+        Image img2 = new Image(uploader, filePath, description);
+        int hashCode2 = img2.hashCode();
+
+        assertNotEquals(img1, img2);
+        assertNotEquals(hashCode1, hashCode2);
+
+        assertEquals(img1, img1);
+        assertEquals(hashCode1, hashCode3);
+    }
+
+    @Test
+    void testEqualsWithNull() {
+        assertNotEquals(image, null);
+    }
+
+    @Test
+    void testEqualsWithDifferentType() {
+        assertNotEquals(image, "not an image");
+    }
+
+    @Test
+    void testToString() {
+        String result = image.toString();
+        assertNotNull(result);
+        assertEquals(result, "Image[id=]" + image.getId() + ", uplaoder=testuser, filePath=/path/to/image.jpg, uploadedAt=" + image.getUploadedAt());
+    }
+}
