@@ -13,7 +13,7 @@ public class Image {
   private final String id;
   private final String uploader;
   private final String filePath;
-  private final LocalDateTime timestamp;
+  private final LocalDateTime uploadedAt;
   private final String description;
 
   /**
@@ -27,7 +27,7 @@ public class Image {
     this.id = UUID.randomUUID().toString();
     this.uploader = uploader;
     this.filePath = filePath;
-    this.timestamp = LocalDateTime.now();
+    this.uploadedAt = LocalDateTime.now();
     this.description = description == null ? "" : description;
   }
 
@@ -56,8 +56,8 @@ public class Image {
   /**
    * Returns the timestamp when this image was uploaded.
    */
-  public LocalDateTime getTimestamp() {
-    return timestamp;
+  public LocalDateTime getUploadedAt() {
+    return uploadedAt;
   }
 
   /**
@@ -70,12 +70,12 @@ public class Image {
   /**
    * Returns a string representation of this image.
    *
-   * @return Image[id, uploader, filePath, timestamp]
+   * @return Image[id, uploader, filePath, uploadedAt]
    */
   @Override
   public String toString() {
-    return String.format("Image[id=%s, uploader=%s, filePath=%s, timestamp=%s]",
-        id, uploader, filePath, timestamp);
+    return String.format("Image[id=%s, uploader=%s, filePath=%s, uploadedAt=%s]",
+        id, uploader, filePath, uploadedAt);
   }
 
   /**
