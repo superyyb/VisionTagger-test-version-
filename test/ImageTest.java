@@ -82,19 +82,14 @@ public class ImageTest {
     }
 
     @Test
-    void testEqualsWithNull() {
-        assertNotEquals(image, null);
+    void testEqualsWithInvalidObject() {
+        assertFalse(image.equals(null));
+        assertFalse(image.equals("not an image"));
     }
-
-    @Test
-    void testEqualsWithDifferentType() {
-        assertNotEquals(image, "not an image");
-    }
-
+    
     @Test
     void testToString() {
         String result = image.toString();
-        assertNotNull(result);
-        assertEquals(result, "Image[id=]" + image.getId() + ", uplaoder=testuser, filePath=/path/to/image.jpg, uploadedAt=" + image.getUploadedAt());
+        assertEquals(result, "Image[id=" + image.getId() + ", uploader=" + uploader + ", filePath=" + filePath + ", uploadedAt=" + image.getUploadedAt() + "]");
     }
 }
