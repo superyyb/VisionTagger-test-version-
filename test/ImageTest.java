@@ -34,6 +34,14 @@ public class ImageTest {
     }
 
     @Test
+    void testConstructorWithoutDescription() {
+        Image img = new Image(uploader, filePath);
+        assertEquals("", img.getDescription());
+        assertEquals(uploader, img.getUploader());
+        assertEquals(filePath, img.getFilePath());
+    }
+
+    @Test
     void testConstructorWithNullDescription() {
         Image img = new Image(uploader, filePath, null);
         assertEquals("", img.getDescription());

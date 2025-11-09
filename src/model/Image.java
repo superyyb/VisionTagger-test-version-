@@ -17,6 +17,16 @@ public class Image {
   private final String description;
 
   /**
+   * Constructs an Image object without a description.
+   *
+   * @param uploader the user who uploaded the image
+   * @param filePath the path of the image file
+   */
+  public Image(String uploader, String filePath) {
+    this(uploader, filePath, "");
+  }
+
+  /**
    * Constructs an Image object with all fields initialized.
    *
    * @param uploader    the user who uploaded the image
