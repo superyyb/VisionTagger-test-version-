@@ -6,6 +6,8 @@ import java.util.UUID;
 /**
  * Represents a user of the VisionTaggerApp. Each user has a unique ID, username, and an optional
  * email address.
+ * Users can be either registered or guest. A registered user has a unique username (user_<username>) and an email address.
+ * A guest user's id is a random UUID, and there can be multiple guest users with the same username.
  */
 public class User {
   private final String id;
