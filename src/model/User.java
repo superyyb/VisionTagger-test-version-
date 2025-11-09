@@ -1,6 +1,7 @@
 package model;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Represents a user of the VisionTaggerApp. Each user has a unique ID, username, and an optional
@@ -10,17 +11,56 @@ public class User {
   private final String id;
   private final String username;
   private final String email;
+  private final boolean isRegistered;
+
+  /**
+   * Constructs a guest User object without an email address.
+   *
+   * @param username the username of the user
+   */
+  public User(String username) {
+    this.id = UUID.randomUUID().toString();
+    this.username = username;
+    this.email = "";
+    this.isRegistered = false;
+  }
 
   /**
    * Constructs a User object with all fields initialized.
    *
    * @param username the username of the user
-   * @param email    the email address of the user; empty string by default
+   * @param email    the email address of the user
    */
   public User(String username, String email) {
     this.id = generateId(username);
     this.username = username;
-    this.email = email == null ? "" : email;
+    this.email = email;
+    this.isRegistered = (email != null && !email.isEmpty());
+  }
+
+  /**
+   * Creates a guest user with a unique ID. Guest users can have duplicate usernames.
+   *
+   * @param username the username of the guest user
+   * @return a new guest User object
+   */
+  public static User guestUser(String username) {
+    return new User(username);
+  }
+
+  /**
+   * Creates a registered user with an email address. Registered users must have unique usernames.
+   * Note: Username uniqueness should be validated by UserService before calling this method.
+   *
+   * @param username the username of the registered user
+   * @param email    the email address of the registered user
+   * @return a new registered User object
+   */
+  public static User registeredUser(String username, String email) {
+    if (email == null || email.trim().isEmpty()) {
+      throw new IllegalArgumentException("Registered users must provide an email address");
+    }
+    return new User(username, email);
   }
 
   /**
@@ -53,6 +93,15 @@ public class User {
    */
   public String getEmail() {
     return email;
+  }
+
+  /**
+   * Returns whether this user is registered (has an email address).
+   *
+   * @return true if the user is registered, false if guest
+   */
+  public boolean isRegistered() {
+    return isRegistered;
   }
 
   /**
