@@ -1,6 +1,5 @@
-import model.DetectionResult;
-import model.Image;
-import model.Label;
+package model;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
