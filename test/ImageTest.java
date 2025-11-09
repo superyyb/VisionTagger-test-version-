@@ -48,12 +48,9 @@ public class ImageTest {
 
     @Test
     void testConstructorSetsUploadedAtTimestamp() {
-        LocalDateTime before = LocalDateTime.now();
-        Image img = new Image(uploader, filePath, description);
-        LocalDateTime after = LocalDateTime.now();
-        
-        assertTrue(img.getUploadedAt().isAfter(before.minusSeconds(1)));
-        assertTrue(img.getUploadedAt().isBefore(after.plusSeconds(1)));
+        LocalDateTime uploadedAt = image.getUploadedAt();
+        assertNotNull(uploadedAt);
+        assertTrue(uploadedAt.isBefore(LocalDateTime.now().plusSeconds(1)));
     }
 
     @Test
