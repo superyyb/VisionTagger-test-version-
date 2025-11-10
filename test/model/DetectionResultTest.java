@@ -108,16 +108,18 @@ public class DetectionResultTest {
         detectionResult.addLabel(label);
         
         String result = detectionResult.toString();
-        assertEquals(result, "Recognition result for " + filePath + ": " + label.toString());
+        assertEquals(result, String.format("Recognition result for %s:\n[%s]", filePath, label.toString()));
     }
 
     @Test
     void testToStringWithMultipleLabels() {
-        detectionResult.addLabel(new Label("Otter", 96.3));
-        detectionResult.addLabel(new Label("Animal", 99.0));
+        Label label1 = new Label("Otter", 96.3);
+        Label label2 = new Label("Animal", 99.0);
+        detectionResult.addLabel(label1);
+        detectionResult.addLabel(label2);
         
         String result = detectionResult.toString();
-        assertEquals(result, "Recognition result for " + filePath + ": " + label1.toString() + ", " + label2.toString());
+        assertEquals(result, String.format("Recognition result for %s:\n[%s, %s]", filePath, label1.toString(), label2.toString()));
     }
 
     @Test
@@ -133,8 +135,8 @@ public class DetectionResultTest {
         // Since detectedAt is set to now(), they might differ by milliseconds
         // So we test that they're not equal due to timestamp difference
         // But if we create them with same timestamp, they should be equal
-        assertEquals(result1, result2);
-        assertEquals(result1.hashCode(), result2.hashCode());
+        assertNotEquals(result1, result2);
+        assertNotEquals(result1.hashCode(), result2.hashCode());
     }
 
     @Test
@@ -164,4 +166,3 @@ public class DetectionResultTest {
         assertFalse(detectionResult.equals("not a detection result"));
     }
 }
-

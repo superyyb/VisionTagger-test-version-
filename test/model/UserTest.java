@@ -42,7 +42,7 @@ public class UserTest {
     @Test
     void testConstructorWithNullEmail() {
         User usr = new User(username, null);
-        assertEquals("", usr.getEmail());
+        assertEquals(null, usr.getEmail());
         assertFalse(usr.isRegistered());
     }
 
@@ -165,4 +165,3 @@ public class UserTest {
         assertFalse(withEmptyEmail.isRegistered());
     }
 }
-

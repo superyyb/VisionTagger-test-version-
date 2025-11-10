@@ -75,6 +75,6 @@ public class LabelTest {
     @Test
     void testToString() {
         String result = label.toString();
-        assertEquals(result, name + " (" + confidence + "%)");
+        assertEquals(result, String.format("%s (%.2f%%)", name, confidence));
     }
 }
