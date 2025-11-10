@@ -23,7 +23,18 @@ public class MockRekognitionServiceTest {
 
     private MockRekognitionService service;
     private static final Set<String> VALID_LABELS = new HashSet<>(Arrays.asList(
-            "Otter", "Animal", "Sea", "Flower", "Plant", "Food", "Person"
+        // Animals
+        "Animal", "Dog", "Cat", "Bird", "Horse", "Otter", "Fish", "Elephant", "Lion", "Bear",
+        // Nature & Environment
+        "Plant", "Flower", "Tree", "Sea", "Ocean", "Beach", "Mountain", "Forest", "Sky", "Water",
+        // Food & Dining
+        "Food", "Pizza", "Coffee", "Fruit", "Vegetable", "Dessert", "Restaurant", "Dining",
+        // People & Activities
+        "Person", "People", "Child", "Adult", "Sports", "Exercise", "Dancing", "Running",
+        // Objects & Technology
+        "Vehicle", "Car", "Bicycle", "Phone", "Computer", "Book", "Furniture", "Clothing",
+        // Scenes & Settings
+        "Indoor", "Outdoor", "Urban", "Nature", "Building", "Room", "Street", "Park"
     ));
 
     @BeforeEach
@@ -64,8 +75,8 @@ public class MockRekognitionServiceTest {
         List<Label> labels = result.getLabels();
 
         assertNotNull(labels, "Labels list should not be null");
-        assertTrue(labels.size() >= 1 && labels.size() <= 4,
-                "Should generate between 1 and 4 labels, but got: " + labels.size());
+        assertTrue(labels.size() >= 3 && labels.size() <= 15,
+                "Should generate between 3 and 15 labels, but got: " + labels.size());
     }
 
     @RepeatedTest(20)
@@ -76,8 +87,8 @@ public class MockRekognitionServiceTest {
 
         for (Label label : labels) {
             double confidence = label.getConfidence();
-            assertTrue(confidence >= 55.0 && confidence <= 100.0,
-                    String.format("Confidence should be between 55.0 and 100.0, but got: %.2f", confidence));
+            assertTrue(confidence >= 30.0 && confidence <= 100.0,
+                    String.format("Confidence should be between 30.0 and 100.0, but got: %.2f", confidence));
         }
     }
 
@@ -99,12 +110,15 @@ public class MockRekognitionServiceTest {
         DetectionResult result = service.detect(image);
         List<Label> labels = result.getLabels();
 
-        // Check that labels are unique (name + confidence combination)
-        Set<Label> uniqueLabels = new HashSet<>(labels);
-        // Note: Since labels can have same name but different confidence, we check the full label
-        // If we want to ensure unique names only, we'd need a different check
-        assertEquals(labels.size(), uniqueLabels.size(),
-                "All labels should be unique (name + confidence combination)");
+        // Check that label names are unique (no duplicate label names in a single detection)
+        Set<String> uniqueLabelNames = new HashSet<>();
+        for (Label label : labels) {
+            assertFalse(uniqueLabelNames.contains(label.getName()),
+                    String.format("Label name '%s' should be unique in a single detection", label.getName()));
+            uniqueLabelNames.add(label.getName());
+        }
+        assertEquals(labels.size(), uniqueLabelNames.size(),
+                "All label names should be unique in a single detection");
     }
 
     @Test
@@ -129,8 +143,8 @@ public class MockRekognitionServiceTest {
         assertEquals(image, result2.getImage());
         
         // The labels or their order might differ due to randomness
-        assertTrue(result1.getLabels().size() >= 1 && result1.getLabels().size() <= 4);
-        assertTrue(result2.getLabels().size() >= 1 && result2.getLabels().size() <= 4);
+        assertTrue(result1.getLabels().size() >= 3 && result1.getLabels().size() <= 15);
+        assertTrue(result2.getLabels().size() >= 3 && result2.getLabels().size() <= 15);
     }
 
     @Test
@@ -161,8 +175,10 @@ public class MockRekognitionServiceTest {
             }
         }
         
-        // With 50 runs, we should have generated at least some of the labels
+        // With 50 runs, we should have generated a diverse set of labels
         assertFalse(generatedLabels.isEmpty(), "Should generate at least some labels");
-        assertTrue(generatedLabels.size() > 0, "Should generate multiple different labels");
+        assertTrue(generatedLabels.size() >= 10, 
+                String.format("Should generate at least 10 different labels across 50 runs, but got: %d", 
+                        generatedLabels.size()));
     }
 }
