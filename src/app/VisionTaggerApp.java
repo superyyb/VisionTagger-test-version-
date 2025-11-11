@@ -35,35 +35,48 @@ public class VisionTaggerApp {
    * In production, these would be replaced with real implementations (e.g., DynamoDB,
    * S3, AWS Rekognition).
    * 
-   * @param args command-line arguments (currently unused)
+   * <p>Command-line usage:
+   * <ul>
+   *   <li>{@code java VisionTaggerApp --json &lt;filepath&gt;} - Output results as JSON</li>
+   *   <li>{@code java VisionTaggerApp --gui &lt;filepath&gt;} - Display results in GUI window</li>
+   *   <li>{@code java VisionTaggerApp &lt;filepath&gt;} - Display results in console (default)</li>
+   *   <li>{@code java VisionTaggerApp} - Prompts for file path interactively</li>
+   * </ul>
+   * 
+   * @param args command-line arguments: optional view flag (--json or --gui) and file path
    */
   public static void main(String[] args) {
-    
     ImageAnalyzerService analyzer = new MockRekognitionService();
-    View view;
+    View view = new ConsoleView(); // default
+    String filePath = null;
 
-    // Choose view mode
-    if (args.length > 0 && args[0].equals("--json")) {
-      view = new JsonView();
-    } else if (args.length > 0 && args[0].equals("--gui")) {
-      view = new SwingView();
-    } else {
-      view = new ConsoleView();
+    // Parse command-line arguments
+    if (args.length > 0) {
+      switch (args[0]) {
+        case "--json":
+          view = new JsonView();
+          if (args.length > 1) filePath = args[1];
+          break;
+        case "--gui":
+          // SwingView needs analyzer if you’re using the enhanced version
+          view = new SwingView();
+          if (args.length > 1) filePath = args[1];
+          break;
+        default:
+          // First argument is the file path
+          filePath = args[0];
+      }
     }
 
-    ImageController controller = new ImageController(analyzer, view);
-
-    // Choose input method
-    String filePath;
-    if (args.length > 1) {
-      filePath = args[1];
-    } else {
-      @SuppressWarnings("resource") // Intentionally not closing Scanner(System.in)
+    // Only ask for input if still null
+    if (filePath == null) {
+      @SuppressWarnings("resource")
       Scanner input = new Scanner(System.in);
       System.out.print("Enter image file path: ");
       filePath = input.nextLine();
     }
 
+    ImageController controller = new ImageController(analyzer, view);
     controller.process(filePath);
   }
 }
