@@ -7,15 +7,8 @@ import model.Label;
  * Console-based implementation of the View interface.
  * 
  * <p>This view renders detection results in a human-readable format suitable
- * for console/terminal output. Currently not implemented.
- * 
- * <p>TODO: Implement console rendering:
- * <ul>
- *   <li>Format DetectionResult for console display</li>
- *   <li>Display labels with confidence scores</li>
- *   <li>Format timestamps and metadata</li>
- *   <li>Handle multi-result displays</li>
- * </ul>
+ * for console/terminal output. Displays the image path and all detected labels
+ * with their confidence scores in a formatted text layout.
  * 
  * @author VisionTagger Team
  * @version 1.0
@@ -23,13 +16,12 @@ import model.Label;
 public class ConsoleView implements View {
   @Override
   public void display(DetectionResult result) {
-    System.out.println("VisionTagger Detction Result");
+    System.out.println("VisionTagger Detection Result");
     System.out.println("Image: " + result.getImage().getStoragePath());
     System.out.println("Detected Labels:");
 
-    for (Label lebel : result.getLabels()) {
-      System.out.printf(" - %s (%.2f%%)", lebel.getName(), lebel.getConfidence());
+    for (Label label : result.getLabels()) {
+      System.out.printf(" - %s (%.2f%%)\n", label.getName(), label.getConfidence());
     }
-    System.out.println();
   }
 }
