@@ -2,6 +2,7 @@ package app;
 
 import model.DetectionResult;
 import model.Image;
+import model.User;
 import service.ImageAnalyzerService;
 import service.MockRekognitionService;
 
@@ -13,8 +14,11 @@ public class VisionTaggerApp {
       // Create image analyzer service
       ImageAnalyzerService analyzer = new MockRekognitionService();
       
-      // Create an image to analyze
-      Image image = new Image("testuser", "/path/to/image.jpg", "Test description");
+      // Create a user (guest user for demo)
+      User user = User.guestUser("testuser");
+      
+      // Create an image to analyze (using user ID)
+      Image image = new Image(user.getId(), "/path/to/image.jpg", "Test description");
       
       // Analyze the image
       DetectionResult result = analyzer.detect(image);

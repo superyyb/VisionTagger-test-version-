@@ -14,14 +14,14 @@ public class DetectionResultTest {
 
     private DetectionResult detectionResult;
     private Image image;
-    private String uploader;
+    private User user;
     private String filePath;
 
     @BeforeEach
     void setUp() {
-        uploader = "testuser";
+        user = User.guestUser("testuser");
         filePath = "/path/to/image.jpg";
-        image = new Image(uploader, filePath, "Test description");
+        image = new Image(user.getId(), filePath, "Test description");
         detectionResult = new DetectionResult(image);
     }
 
@@ -141,7 +141,8 @@ public class DetectionResultTest {
 
     @Test
     void testEqualsWithDifferentImage() {
-        Image image2 = new Image("otheruser", "/other/path.jpg", "Other");
+        User otherUser = User.guestUser("otheruser");
+        Image image2 = new Image(otherUser.getId(), "/other/path.jpg", "Other");
         DetectionResult result1 = new DetectionResult(image);
         DetectionResult result2 = new DetectionResult(image2);
         

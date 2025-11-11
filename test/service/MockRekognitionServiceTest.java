@@ -3,6 +3,7 @@ package service;
 import model.Image;
 import model.DetectionResult;
 import model.Label;
+import model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.RepeatedTest;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MockRekognitionServiceTest {
 
     private MockRekognitionService service;
+    private User testUser;
     private static final Set<String> VALID_LABELS = new HashSet<>(Arrays.asList(
         // Animals
         "Animal", "Dog", "Cat", "Bird", "Horse", "Otter", "Fish", "Elephant", "Lion", "Bear",
@@ -40,11 +42,12 @@ public class MockRekognitionServiceTest {
     @BeforeEach
     void setUp() {
         service = new MockRekognitionService();
+        testUser = User.guestUser("testuser");
     }
 
     @Test
     void testDetectReturnsDetectionResult() {
-        Image image = new Image("testuser", "/path/to/image.jpg");
+        Image image = new Image(testUser.getId(), "/path/to/image.jpg");
         DetectionResult result = service.detect(image);
 
         assertNotNull(result);
@@ -53,7 +56,7 @@ public class MockRekognitionServiceTest {
 
     @Test
     void testDetectReturnsResultWithCorrectImage() {
-        Image image = new Image("testuser", "/path/to/image.jpg", "Test description");
+        Image image = new Image(testUser.getId(), "/path/to/image.jpg", "Test description");
         DetectionResult result = service.detect(image);
 
         assertEquals(image, result.getImage(), "Result should contain the input image");
@@ -70,7 +73,7 @@ public class MockRekognitionServiceTest {
 
     @RepeatedTest(20)
     void testDetectGeneratesCorrectNumberOfLabels() {
-        Image image = new Image("testuser", "/path/to/image.jpg");
+        Image image = new Image(testUser.getId(), "/path/to/image.jpg");
         DetectionResult result = service.detect(image);
         List<Label> labels = result.getLabels();
 
@@ -81,7 +84,7 @@ public class MockRekognitionServiceTest {
 
     @RepeatedTest(20)
     void testDetectGeneratesLabelsWithValidConfidence() {
-        Image image = new Image("testuser", "/path/to/image.jpg");
+        Image image = new Image(testUser.getId(), "/path/to/image.jpg");
         DetectionResult result = service.detect(image);
         List<Label> labels = result.getLabels();
 
@@ -94,7 +97,7 @@ public class MockRekognitionServiceTest {
 
     @RepeatedTest(20)
     void testDetectGeneratesLabelsFromSampleSet() {
-        Image image = new Image("testuser", "/path/to/image.jpg");
+        Image image = new Image(testUser.getId(), "/path/to/image.jpg");
         DetectionResult result = service.detect(image);
         List<Label> labels = result.getLabels();
 
@@ -106,7 +109,7 @@ public class MockRekognitionServiceTest {
 
     @RepeatedTest(20)
     void testDetectGeneratesUniqueLabelsInSingleCall() {
-        Image image = new Image("testuser", "/path/to/image.jpg");
+        Image image = new Image(testUser.getId(), "/path/to/image.jpg");
         DetectionResult result = service.detect(image);
         List<Label> labels = result.getLabels();
 
@@ -123,7 +126,7 @@ public class MockRekognitionServiceTest {
 
     @Test
     void testDetectResultHasDetectedAtTimestamp() {
-        Image image = new Image("testuser", "/path/to/image.jpg");
+        Image image = new Image(testUser.getId(), "/path/to/image.jpg");
         DetectionResult result = service.detect(image);
 
         assertNotNull(result.getDetectedAt(), "detectedAt timestamp should not be null");
@@ -131,7 +134,7 @@ public class MockRekognitionServiceTest {
 
     @RepeatedTest(10)
     void testDetectProducesDifferentResultsForSameImage() {
-        Image image = new Image("testuser", "/path/to/image.jpg");
+        Image image = new Image(testUser.getId(), "/path/to/image.jpg");
         DetectionResult result1 = service.detect(image);
         DetectionResult result2 = service.detect(image);
 
@@ -149,8 +152,10 @@ public class MockRekognitionServiceTest {
 
     @Test
     void testDetectWithDifferentImages() {
-        Image image1 = new Image("user1", "/path/to/image1.jpg");
-        Image image2 = new Image("user2", "/path/to/image2.jpg", "Description");
+        User user1 = User.guestUser("user1");
+        User user2 = User.guestUser("user2");
+        Image image1 = new Image(user1.getId(), "/path/to/image1.jpg");
+        Image image2 = new Image(user2.getId(), "/path/to/image2.jpg", "Description");
         
         DetectionResult result1 = service.detect(image1);
         DetectionResult result2 = service.detect(image2);
@@ -164,7 +169,7 @@ public class MockRekognitionServiceTest {
 
     @RepeatedTest(50)
     void testDetectCoversAllSampleLabels() {
-        Image image = new Image("testuser", "/path/to/image.jpg");
+        Image image = new Image(testUser.getId(), "/path/to/image.jpg");
         Set<String> generatedLabels = new HashSet<>();
         
         // Run multiple times to increase chance of covering all labels

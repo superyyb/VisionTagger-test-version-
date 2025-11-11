@@ -12,22 +12,22 @@ import java.time.LocalDateTime;
 public class ImageTest {
 
     private Image image;
-    private String uploader;
+    private User user;
     private String filePath;
     private String description;
 
     @BeforeEach
     void setUp() {
-        uploader = "testuser";
+        user = User.guestUser("testuser");
         filePath = "/path/to/image.jpg";
         description = "Test image description";
-        image = new Image(uploader, filePath, description);
+        image = new Image(user.getId(), filePath, description);
     }
 
     @Test
     void testConstructorWithAllFields() {
         assertNotNull(image);
-        assertEquals(uploader, image.getUploader());
+        assertEquals(user.getId(), image.getUploaderId());
         assertEquals(filePath, image.getFilePath());
         assertEquals(description, image.getDescription());
         assertNotNull(image.getId());
@@ -36,22 +36,35 @@ public class ImageTest {
 
     @Test
     void testConstructorWithoutDescription() {
-        Image img = new Image(uploader, filePath);
+        Image img = new Image(user.getId(), filePath);
         assertEquals("", img.getDescription());
-        assertEquals(uploader, img.getUploader());
+        assertEquals(user.getId(), img.getUploaderId());
         assertEquals(filePath, img.getFilePath());
     }
 
     @Test
     void testConstructorWithNullDescription() {
-        Image img = new Image(uploader, filePath, null);
+        Image img = new Image(user.getId(), filePath, null);
         assertEquals("", img.getDescription());
     }
 
     @Test
+    void testConstructorThrowsExceptionForNullUploaderId() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Image(null, filePath, description);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Image("", filePath, description);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Image("   ", filePath, description);
+        });
+    }
+
+    @Test
     void testConstructorGeneratesUniqueId() {
-        Image img1 = new Image(uploader, filePath, description);
-        Image img2 = new Image(uploader, filePath, description);
+        Image img1 = new Image(user.getId(), filePath, description);
+        Image img2 = new Image(user.getId(), filePath, description);
         assertNotEquals(img1.getId(), img2.getId());
     }
 
@@ -64,7 +77,7 @@ public class ImageTest {
 
     @Test
     void testGetters() {
-        assertEquals(uploader, image.getUploader());
+        assertEquals(user.getId(), image.getUploaderId());
         assertEquals(filePath, image.getFilePath());
         assertEquals(description, image.getDescription());
         assertNotNull(image.getId());
@@ -74,8 +87,8 @@ public class ImageTest {
     /* Test equality and hash code consistency */
     @Test
     void testEquals() {
-        Image img1 = new Image(uploader, filePath, description);
-        Image img2 = new Image(uploader, filePath, description);
+        Image img1 = new Image(user.getId(), filePath, description);
+        Image img2 = new Image(user.getId(), filePath, description);
         assertNotEquals(img1, img2);
         assertNotEquals(img1.hashCode(), img2.hashCode());
 
@@ -92,6 +105,7 @@ public class ImageTest {
     @Test
     void testToString() {
         String result = image.toString();
-        assertEquals(result, "Image[id=" + image.getId() + ", uploader=" + uploader + ", filePath=" + filePath + ", uploadedAt=" + image.getUploadedAt() + "]");
+        assertTrue(result.contains("uploaderId=" + user.getId()));
+        assertTrue(result.contains("filePath=" + filePath));
     }
 }

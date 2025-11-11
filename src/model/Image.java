@@ -5,13 +5,13 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Represents an image uploaded by the user. Each image has an ID, uploader, file path, upload
+ * Represents an image uploaded by the user. Each image has an ID, uploader ID, file path, upload
  * timestamp and an optional description.
  */
 public class Image {
 
   private final String id;
-  private final String uploader;
+  private final String uploaderId;
   private final String filePath;
   private final LocalDateTime uploadedAt;
   private final String description;
@@ -19,23 +19,26 @@ public class Image {
   /**
    * Constructs an Image object without a description.
    *
-   * @param uploader the user who uploaded the image
+   * @param uploaderId the unique ID of the user who uploaded the image
    * @param filePath the path of the image file
    */
-  public Image(String uploader, String filePath) {
-    this(uploader, filePath, "");
+  public Image(String uploaderId, String filePath) {
+    this(uploaderId, filePath, "");
   }
 
   /**
    * Constructs an Image object with all fields initialized.
    *
-   * @param uploader    the user who uploaded the image
+   * @param uploaderId  the unique ID of the user who uploaded the image
    * @param filePath    the path of the image file
    * @param description optional text description of this image; empty string by default
    */
-  public Image(String uploader, String filePath, String description) {
+  public Image(String uploaderId, String filePath, String description) {
+    if (uploaderId == null || uploaderId.trim().isEmpty()) {
+      throw new IllegalArgumentException("Uploader ID cannot be null or empty");
+    }
     this.id = UUID.randomUUID().toString();
-    this.uploader = uploader;
+    this.uploaderId = uploaderId.trim();
     this.filePath = filePath;
     this.uploadedAt = LocalDateTime.now();
     this.description = description == null ? "" : description;
@@ -50,10 +53,12 @@ public class Image {
   }
 
   /**
-   * Returns the uploader of this image.
+   * Returns the unique ID of the user who uploaded this image.
+   * 
+   * @return the user ID of the uploader
    */
-  public String getUploader() {
-    return uploader;
+  public String getUploaderId() {
+    return uploaderId;
   }
 
   /**
@@ -80,12 +85,12 @@ public class Image {
   /**
    * Returns a string representation of this image.
    *
-   * @return Image[id, uploader, filePath, uploadedAt]
+   * @return Image[id, uploaderId, filePath, uploadedAt]
    */
   @Override
   public String toString() {
-    return String.format("Image[id=%s, uploader=%s, filePath=%s, uploadedAt=%s]",
-        id, uploader, filePath, uploadedAt);
+    return String.format("Image[id=%s, uploaderId=%s, filePath=%s, uploadedAt=%s]",
+        id, uploaderId, filePath, uploadedAt);
   }
 
   /**
