@@ -5,11 +5,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Represents an image uploaded by the user. Immutable once created.
- * Each image has an ID, uploader ID, storage path, uploaded at timestamp and an optional description.
- * timestamp and an optional description.
+ * Represents an image uploaded by a user. 
+ * Immutable once created.
  */
-public class Image {
+public final class Image {
 
   private final String id;
   private final String uploaderId;
