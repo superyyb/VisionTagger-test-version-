@@ -43,10 +43,40 @@ public final class Image {
   }
 
   // Getters
+  
+  /**
+   * Gets the unique identifier for this image.
+   * 
+   * @return the image ID (UUID string)
+   */
   public String getId() { return id; }
+  
+  /**
+   * Gets the ID of the user who uploaded this image.
+   * 
+   * @return the uploader's user ID
+   */
   public String getUploaderId() { return uploaderId; }
+  
+  /**
+   * Gets the storage path or URI where the image file is stored.
+   * 
+   * @return the storage path/URI
+   */
   public String getStoragePath() { return storagePath; }
+  
+  /**
+   * Gets the timestamp when the image was uploaded.
+   * 
+   * @return the upload timestamp
+   */
   public LocalDateTime getUploadedAt() { return uploadedAt; }
+  
+  /**
+   * Gets the optional description of the image.
+   * 
+   * @return the description (empty string if none was provided)
+   */
   public String getDescription() { return description; }
 
   @Override

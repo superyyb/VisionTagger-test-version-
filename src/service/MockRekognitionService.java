@@ -13,7 +13,7 @@ import model.DetectionResult;
  * Uses a diverse set of labels covering various categories similar to AWS Rekognition.
  */
 public class MockRekognitionService implements ImageAnalyzerService {
-    // Expanded label set covering multiple categories (animals, objects, scenes, activities, etc.)
+    // Label set covering multiple categories (animals, objects, scenes, activities, etc.)
     private static final String[] SAMPLE_LABELS = {
         // Animals
         "Animal", "Dog", "Cat", "Bird", "Horse", "Otter", "Fish", "Elephant", "Lion", "Bear",
@@ -35,6 +35,23 @@ public class MockRekognitionService implements ImageAnalyzerService {
     private static final double MIN_CONFIDENCE = 30.0;
     private static final double MAX_CONFIDENCE = 100.0;
 
+    /**
+     * Performs mock image detection by randomly generating labels and confidence scores.
+     * 
+     * <p>This method simulates an image recognition service by:
+     * <ol>
+     *   <li>Generating a random number of labels (3-15)</li>
+     *   <li>Selecting unique labels from a predefined set</li>
+     *   <li>Assigning random confidence scores (30-100%)</li>
+     * </ol>
+     * 
+     * <p>This is useful for testing and development without requiring actual
+     * image recognition API access.
+     * 
+     * @param image the image to analyze
+     * @return a DetectionResult containing randomly generated labels
+     * @throws IllegalArgumentException if image is null
+     */
     @Override
     public DetectionResult detect(Image image) {
         if (image == null) {
@@ -42,7 +59,7 @@ public class MockRekognitionService implements ImageAnalyzerService {
         }
         DetectionResult result = new DetectionResult(image);
 
-        // Generate 3-15 labels (more realistic range for real image recognition services)
+        // Generate 3-15 labels
         int labelCount = MIN_LABELS + random.nextInt(MAX_LABELS - MIN_LABELS + 1);
         
         // Use a set to ensure unique label names in a single detection

@@ -16,5 +16,4 @@ public interface ImageAnalyzerService {
      * @return a DetectionResult containing detected labels
      */
     DetectionResult detect(Image image);
-
 }

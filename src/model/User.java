@@ -54,10 +54,41 @@ public final class User {
     return new User(id, username.trim(), email.trim(), Type.REGISTERED);
   }
 
+  /**
+   * Gets the unique identifier for this user.
+   * 
+   * @return the user ID
+   */
   public String getId() { return id; }
+  
+  /**
+   * Gets the username of this user.
+   * 
+   * @return the username
+   */
   public String getUsername() { return username; }
+  
+  /**
+   * Gets the email address of this user.
+   * 
+   * <p>For guest users, this will be an empty string.
+   * 
+   * @return the email address (empty string for guest users)
+   */
   public String getEmail() { return email; }
+  
+  /**
+   * Gets the type of this user (GUEST or REGISTERED).
+   * 
+   * @return the user type
+   */
   public Type getType() { return type; }
+  
+  /**
+   * Checks if this user is a registered user.
+   * 
+   * @return true if the user is registered, false if guest
+   */
   public boolean isRegistered() { return type == Type.REGISTERED; }
 
   @Override

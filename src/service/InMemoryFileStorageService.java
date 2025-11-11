@@ -15,17 +15,29 @@ import model.DetectionResult;
  * In-memory implementation of FileStorageService that mimics AWS DynamoDB behavior.
  * 
  * This implementation simulates DynamoDB's structure:
- * Primary Key: imageId (partition key) - O(1) lookup
- * Global Secondary Index (GSI): userId - O(1) lookup via index
+ * Primary Key: imageId (partition key)
+ * Global Secondary Index (GSI): userId
  */
 public class InMemoryFileStorageService implements FileStorageService {
-    // Primary table: imageId -> DetectionResult (simulates DynamoDB primary key)
+    // Primary table: imageId -> DetectionResult
     private final Map<String, DetectionResult> primaryTable = new HashMap<>();
     
-    // Global Secondary Index (GSI): userId -> List<imageId> (simulates DynamoDB GSI)
-    // This allows O(1) lookup for userId queries instead of O(n) scan
+    // Global Secondary Index (GSI): userId -> List<imageId>
     private final Map<String, List<String>> userIdIndex = new HashMap<>();
     
+    /**
+     * Saves a detection result to storage.
+     * 
+     * <p>This method implements DynamoDB-like upsert behavior:
+     * <ul>
+     *   <li>If the image ID already exists, the result is overwritten</li>
+     *   <li>If the userId changes, the index is updated accordingly</li>
+     *   <li>New results are added to both the primary table and GSI index</li>
+     * </ul>
+     * 
+     * @param result the detection result to save (must not be null)
+     * @throws IllegalArgumentException if result is null, or if result's image or IDs are invalid
+     */
     @Override
     public void save(DetectionResult result) {
         if (result == null) {
@@ -44,11 +56,11 @@ public class InMemoryFileStorageService implements FileStorageService {
         String imageId = result.getImage().getId().trim();
         String userId = result.getImage().getUploaderId().trim();
         
-        // Check if this is an update (DynamoDB upsert behavior)
+        // Check if this is an update
         DetectionResult existingResult = primaryTable.get(imageId);
         boolean isUpdate = existingResult != null;
         
-        // Update primary table (DynamoDB put item - overwrites if exists)
+        // Update primary table
         primaryTable.put(imageId, result);
         
         // Update GSI index
@@ -61,16 +73,26 @@ public class InMemoryFileStorageService implements FileStorageService {
                     imageIds.remove(imageId);
                     return imageIds.isEmpty() ? null : imageIds;
                 });
-            } else {
-                // Same userId, no index change needed (item already in index)
-                return;
+                // Add to new userId's index (or create if doesn't exist)
+                userIdIndex.computeIfAbsent(userId, _key -> new ArrayList<>()).add(imageId);
             }
+            // If same userId, item is already in the index, no change needed
+        } else {
+            // New item - add to userId's index (or create if doesn't exist)
+            userIdIndex.computeIfAbsent(userId, _key -> new ArrayList<>()).add(imageId);
         }
-        
-        // Add to new userId's index (or create if doesn't exist)
-        userIdIndex.computeIfAbsent(userId, _key -> new ArrayList<>()).add(imageId);
     }
 
+    /**
+     * Retrieves a detection result by image ID.
+     * 
+     * <p>Uses the primary key lookup for O(1) performance, mimicking DynamoDB's
+     * primary key query behavior.
+     * 
+     * @param imageId the ID of the image to retrieve the detection result for (must not be null or empty)
+     * @return an Optional containing the DetectionResult if found, empty otherwise
+     * @throws IllegalArgumentException if imageId is null or empty
+     */
     @Override
     public Optional<DetectionResult> getResultByImageId(String imageId) {
         if (imageId == null || imageId.trim().isEmpty()) {
@@ -80,6 +102,20 @@ public class InMemoryFileStorageService implements FileStorageService {
         return Optional.ofNullable(primaryTable.get(imageId.trim()));
     }
 
+    /**
+     * Retrieves all detection results for a user by user ID.
+     * 
+     * <p>Uses the GSI (Global Secondary Index) for efficient lookup:
+     * <ul>
+     *   <li>O(1) to get the list of image IDs from the index</li>
+     *   <li>O(k) to fetch results where k = number of results for the user</li>
+     * </ul>
+     * This mimics DynamoDB GSI query behavior.
+     * 
+     * @param userId the unique ID of the user to retrieve detection results for (must not be null or empty)
+     * @return a list of DetectionResult objects for the user, empty list if none found
+     * @throws IllegalArgumentException if userId is null or empty
+     */
     @Override
     public List<DetectionResult> getResultsByUserId(String userId) {
         if (userId == null || userId.trim().isEmpty()) {
@@ -98,10 +134,10 @@ public class InMemoryFileStorageService implements FileStorageService {
     }
     
     /**
-     * Check if a detection result exists for the given image ID.
+     * Checks if a detection result exists for the given image ID.
      * Mimics DynamoDB's conditional check behavior.
      * 
-     * @param imageId the image ID to check
+     * @param imageId the image ID to check (must not be null or empty)
      * @return true if a result exists, false otherwise
      * @throws IllegalArgumentException if imageId is null or empty
      */
@@ -113,10 +149,12 @@ public class InMemoryFileStorageService implements FileStorageService {
     }
     
     /**
-     * Delete a detection result by image ID.
-     * Mimics DynamoDB's delete item operation.
+     * Deletes a detection result by image ID.
      * 
-     * @param imageId the image ID of the result to delete
+     * <p>Mimics DynamoDB's delete item operation. Removes the result from both
+     * the primary table and the GSI index.
+     * 
+     * @param imageId the image ID of the result to delete (must not be null or empty)
      * @return true if the item was deleted, false if it didn't exist
      * @throws IllegalArgumentException if imageId is null or empty
      */
@@ -126,6 +164,7 @@ public class InMemoryFileStorageService implements FileStorageService {
         }
         String trimmedImageId = imageId.trim();
         
+        // Remove from primary table
         DetectionResult result = primaryTable.remove(trimmedImageId);
         if (result == null) {
             return false;
@@ -142,10 +181,12 @@ public class InMemoryFileStorageService implements FileStorageService {
     }
     
     /**
-     * Get the count of detection results for a user.
-     * Mimics DynamoDB's count operation on GSI.
+     * Gets the count of detection results for a user.
      * 
-     * @param userId the user ID to count results for
+     * <p>Mimics DynamoDB's count operation on GSI. Uses the userId index for
+     * efficient counting without scanning all results.
+     * 
+     * @param userId the user ID to count results for (must not be null or empty)
      * @return the number of results for the user
      * @throws IllegalArgumentException if userId is null or empty
      */
@@ -158,8 +199,10 @@ public class InMemoryFileStorageService implements FileStorageService {
     }
 
     /**
-     * Clears all detection results from storage (useful for testing).
-     * This mimics truncating a DynamoDB table.
+     * Clears all detection results from storage.
+     * 
+     * <p>This method is useful for testing and mimics truncating a DynamoDB table.
+     * Removes all entries from both the primary table and the GSI index.
      */
     public void clear() {
         primaryTable.clear();
