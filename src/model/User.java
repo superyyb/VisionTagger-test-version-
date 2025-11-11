@@ -4,143 +4,75 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Represents a user of the VisionTaggerApp. Each user has a unique ID, username, and an optional
- * email address.
- * Users can be either registered or guest. A registered user has a unique username (user_<username>) and an email address.
- * A guest user's id is a random UUID, and there can be multiple guest users with the same username.
+ * Represents a user of the VisionTaggerApp.
+ * A user can be either a guest (temporary) or registered (persistent).
  */
-public class User {
+public final class User {
+
+  public enum Type { GUEST, REGISTERED }
+
   private final String id;
   private final String username;
   private final String email;
-  private final boolean isRegistered;
+  private final Type type;
 
-  /**
-   * Constructs a guest User object without an email address.
-   *
-   * @param username the username of the user
-   */
-  public User(String username) {
-    this.id = UUID.randomUUID().toString();
-    this.username = username;
-    this.email = "";
-    this.isRegistered = false;
-  }
-
-  /**
-   * Constructs a User object with all fields initialized.
-   *
-   * @param username the username of the user
-   * @param email    the email address of the user
-   */
-  public User(String username, String email) {
-    this.id = generateId(username);
+  private User(String id, String username, String email, Type type) {
+    this.id = id;
     this.username = username;
     this.email = email;
-    this.isRegistered = (email != null && !email.isEmpty());
+    this.type = type;
   }
 
   /**
-   * Creates a guest user with a unique ID. Guest users can have duplicate usernames.
+   * Creates a guest user. Guest users can share usernames.
    *
    * @param username the username of the guest user
-   * @return a new guest User object
+   * @return a new guest User
    */
   public static User guestUser(String username) {
-    return new User(username);
+    if (username == null || username.trim().isEmpty()) {
+      throw new IllegalArgumentException("Username cannot be null or empty");
+    }
+    return new User(UUID.randomUUID().toString(), username.trim(), "", Type.GUEST);
   }
 
   /**
-   * Creates a registered user with an email address. Registered users must have unique usernames.
-   * Note: Username uniqueness should be validated by UserService before calling this method.
+   * Creates a registered user. Registered users must have an email and unique usernames.
    *
    * @param username the username of the registered user
-   * @param email    the email address of the registered user
-   * @return a new registered User object
+   * @param email the email of the registered user
+   * @return a new registered User
    */
   public static User registeredUser(String username, String email) {
-    if (email == null || email.trim().isEmpty()) {
-      throw new IllegalArgumentException("Registered users must provide an email address");
+    if (username == null || username.trim().isEmpty()) {
+      throw new IllegalArgumentException("Username cannot be null or empty");
     }
-    return new User(username, email);
+    if (email == null || email.trim().isEmpty()) {
+      throw new IllegalArgumentException("Email cannot be null or empty for registered users");
+    }
+    String id = "user_" + username.trim().toLowerCase().replaceAll("\\s+", "_");
+    return new User(id, username.trim(), email.trim(), Type.REGISTERED);
   }
 
-  /**
-   * Generates a unique ID for the user based on the username.
-   *
-   * @param username the username of the user
-   * @return a formatted string of the form "user_<username>" with whitespace replaced by
-   *         underscores and all letters in lowercase
-   */
-  private String generateId(String username) {
-    return "user_<" + username.trim().toLowerCase().replaceAll("\\s", "_") + ">";
-  }
+  public String getId() { return id; }
+  public String getUsername() { return username; }
+  public String getEmail() { return email; }
+  public Type getType() { return type; }
+  public boolean isRegistered() { return type == Type.REGISTERED; }
 
-  /**
-   * Returns the unique identifier for this user.
-   */
-  public String getId() {
-    return id;
-  }
-
-  /**
-   * Returns the username of this user.
-   */
-  public String getUsername() {
-    return username;
-  }
-
-  /**
-   * Returns the email address of this user.
-   */
-  public String getEmail() {
-    return email;
-  }
-
-  /**
-   * Returns whether this user is registered (has an email address).
-   *
-   * @return true if the user is registered, false if guest
-   */
-  public boolean isRegistered() {
-    return isRegistered;
-  }
-
-  /**
-   * Returns a string representation of this user.
-   *
-   * @return User[id, username, email]
-   */
   @Override
   public String toString() {
-    return String.format("User[id=%s, username=%s, email=%s]", id, username, email);
+    return String.format("User[id=%s, username=%s, email=%s, type=%s]", id, username, email, type);
   }
 
-  /**
-   * Compares this user to another user for equality. Two users are considered equal if they have
-   * the same ID.
-   *
-   * @param o the object to be compared
-   * @return true if two users are equal, false otherwise
-   */
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
+    if (this == o) return true;
+    if (!(o instanceof User)) return false;
     User other = (User) o;
     return id.equals(other.id);
   }
 
-  /**
-   * Returns the hash code of this user. The hash code is based on the user ID, consistent with
-   * equals().
-   *
-   * @return the hash code based on the user ID
-   */
   @Override
   public int hashCode() {
     return Objects.hash(id);
