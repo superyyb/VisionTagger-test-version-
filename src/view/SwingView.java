@@ -7,10 +7,22 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import model.DetectionResult;
+import model.Label;
 
-public class SwingView implements View{
+/**
+ * Swing-based GUI implementation of the View interface.
+ * 
+ * <p>This view renders detection results in a graphical user interface using Java Swing.
+ * Displays the image (if found) and a scrollable list of detected labels with their
+ * confidence scores in a window.
+ * 
+ * @author VisionTagger Team
+ * @version 1.0
+ */
+public class SwingView implements View {
 
     @Override
     public void display(DetectionResult result) {
