@@ -1,5 +1,6 @@
 package view;
 
+import java.util.List;
 import model.DetectionResult;
 import model.Label;
 
@@ -7,15 +8,8 @@ import model.Label;
  * JSON-based implementation of the View interface.
  * 
  * <p>This view renders detection results in JSON format, suitable for API responses
- * or programmatic consumption. Currently not implemented.
- * 
- * <p>TODO: Implement JSON rendering:
- * <ul>
- *   <li>Serialize DetectionResult to JSON</li>
- *   <li>Include all metadata (image info, labels, timestamps)</li>
- *   <li>Handle pretty-printing options</li>
- *   <li>Support JSON array output for multiple results</li>
- * </ul>
+ * or programmatic consumption. Outputs a formatted JSON object containing the image
+ * path and an array of detected labels with their confidence scores.
  * 
  * @author VisionTagger Team
  * @version 1.0
