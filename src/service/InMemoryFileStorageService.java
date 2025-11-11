@@ -14,15 +14,9 @@ import model.DetectionResult;
 /**
  * In-memory implementation of FileStorageService that mimics AWS DynamoDB behavior.
  * 
- * <p>This implementation simulates DynamoDB's structure:
- * <ul>
- *   <li>Primary Key: imageId (partition key) - O(1) lookup</li>
- *   <li>Global Secondary Index (GSI): userId - O(1) lookup via index</li>
- *   <li>Upsert behavior: save() overwrites existing items with same imageId</li>
- * </ul>
- * 
- * <p>This implementation is not thread-safe and should only be used in single-threaded
- * environments or with external synchronization. For production, use DynamoDBFileStorageService.
+ * This implementation simulates DynamoDB's structure:
+ * Primary Key: imageId (partition key) - O(1) lookup
+ * Global Secondary Index (GSI): userId - O(1) lookup via index
  */
 public class InMemoryFileStorageService implements FileStorageService {
     // Primary table: imageId -> DetectionResult (simulates DynamoDB primary key)
