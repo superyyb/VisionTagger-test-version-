@@ -2,79 +2,68 @@ package model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-/** Represents the recognition results of an image by the VisionTaggerApp. It contains the recognized labels and other metadata. */
-public class DetectionResult {
-    private final Image image;
-    private final List<Label> labels;
-    private final LocalDateTime detectedAt;
+/**
+ * Represents recognition results of an image.
+ */
+public final class DetectionResult {
 
-    /**
-     * Constructs a DetectionResult object.
-     * @param image the image that was analyzed
-     */
-    public DetectionResult(Image image) {
-        this.image = image;
-        this.labels = new ArrayList<>();
-        this.detectedAt = LocalDateTime.now();
-    }
+  private final Image image;
+  private final List<Label> labels;
+  private final LocalDateTime detectedAt;
 
-    /** Returns the analyzed image. */
-    public Image getImage() {
-        return image;
+  public DetectionResult(Image image) {
+    if (image == null) {
+      throw new IllegalArgumentException("Image cannot be null");
     }
+    this.image = image;
+    this.labels = new ArrayList<>();
+    this.detectedAt = LocalDateTime.now();
+  }
 
-    /** Returns the list of labels detected from the image. */
-    public List<Label> getLabels() {
-        return labels;
-    }
+  public Image getImage() { return image; }
 
-    /** Returns the date and time when the image was analyzed. */
-    public LocalDateTime getDetectedAt() {
-        return detectedAt;
-    }
+  /** Returns an unmodifiable list of labels to preserve immutability. */
+  public List<Label> getLabels() {
+    return Collections.unmodifiableList(labels);
+  }
 
-    /** Adds a label to the list of labels detected from the image. */
-    public void addLabel(Label label) {
-        labels.add(label);
-    }
+  public LocalDateTime getDetectedAt() { return detectedAt; }
 
-    @Override
-    public String toString() {
-        return String.format("Recognition result for %s:\n%s", image.getFilePath(), labels.toString());
-    }
+  /** Safely add a label. */
+  public void addLabel(Label label) {
+    if (label == null) throw new IllegalArgumentException("Label cannot be null");
+    labels.add(label);
+  }
 
-    /**
-     * Compares this detection result to another detection result for equality.
-     * Two detection results are considered equal if they have the same image, labels, and detection timestamp.
-     *
-     * @param o the object to be compared
-     * @return true if two detection results are equal, false otherwise
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        DetectionResult other = (DetectionResult) o;
-        return Objects.equals(image, other.image) &&
-               Objects.equals(labels, other.labels) &&
-               Objects.equals(detectedAt, other.detectedAt);
-    }
+  /** Returns the label with the highest confidence, or null if empty. */
+  public Label getTopLabel() {
+    return labels.stream()
+                 .max((a, b) -> Double.compare(a.getConfidence(), b.getConfidence()))
+                 .orElse(null);
+  }
 
-    /**
-     * Returns the hash code of this detection result.
-     * The hash code is based on the image, labels, and detection timestamp, consistent with equals().
-     *
-     * @return the hash code based on the image, labels, and detection timestamp
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(image, labels, detectedAt);
-    }
+  @Override
+  public String toString() {
+    return String.format("DetectionResult[image=%s, labels=%s, detectedAt=%s]",
+        image.getFilePath(), labels, detectedAt);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof DetectionResult)) return false;
+    DetectionResult other = (DetectionResult) o;
+    return Objects.equals(image, other.image)
+        && Objects.equals(labels, other.labels)
+        && Objects.equals(detectedAt, other.detectedAt);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(image, labels, detectedAt);
+  }
 }
