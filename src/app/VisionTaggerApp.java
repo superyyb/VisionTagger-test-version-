@@ -1,8 +1,13 @@
 package app;
 
+import java.util.Scanner;
+
 import controller.ImageController;
-import model.User;
 import service.*;
+import view.ConsoleView;
+import view.JsonView;
+import view.SwingView;
+import view.View;
 
 /**
  * Main application entry point for VisionTagger.
@@ -33,22 +38,32 @@ public class VisionTaggerApp {
    * @param args command-line arguments (currently unused)
    */
   public static void main(String[] args) {
-    // Initialize dependencies with in-memory implementations for development
-    UserRepository userRepo = new InMemoryUserRepository();
-    UserService userService = new UserService(userRepo);
-    FileStorageService storage = new InMemoryFileStorageService();
+    
     ImageAnalyzerService analyzer = new MockRekognitionService();
-    ImageController controller = new ImageController(analyzer, storage);
+    View view;
 
-    // Create a registered user
-    User anna = userService.createRegisteredUser("Anna", "anna@example.com");
+    // Choose view mode
+    if (args.length > 0 && args[0].equals("--json")) {
+      view = new JsonView();
+    } else if (args.length > 0 && args[0].equals("--gui")) {
+      view = new SwingView();
+    } else {
+      view = new ConsoleView();
+    }
 
-    // Upload image and analyze it
-    var result = controller.uploadAndAnalyzeImage(anna, "cat.jpg", "A cute cat photo");
-    System.out.println(result);
+    ImageController controller = new ImageController(analyzer, view);
 
-    // Retrieve and display all results for the user
-    System.out.println("All results for " + anna.getUsername() + ":");
-    controller.listUserResults(anna).forEach(System.out::println);
+    // Choose input method
+    String filePath;
+    if (args.length > 1) {
+      filePath = args[1];
+    } else {
+      @SuppressWarnings("resource") // Intentionally not closing Scanner(System.in)
+      Scanner input = new Scanner(System.in);
+      System.out.print("Enter image file path: ");
+      filePath = input.nextLine();
+    }
+
+    controller.process(filePath);
   }
 }
