@@ -1,6 +1,7 @@
 package service;
 
 import model.User;
+import java.util.Optional;
 
 /**
  * Service for managing user creation and validation.
@@ -69,6 +70,19 @@ public class UserService {
       return false;
     }
     return !userRepository.existsByUsername(username.trim());
+  }
+
+  /**
+   * Finds a user by username.
+   *
+   * @param username the username to search for
+   * @return an Optional containing the user if found, empty otherwise
+   */
+  public Optional<User> findByUsername(String username) {
+    if (username == null || username.trim().isEmpty()) {
+      return Optional.empty();
+    }
+    return userRepository.findByUsername(username.trim());
   }
 }
 
