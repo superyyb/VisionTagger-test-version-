@@ -34,6 +34,7 @@ public class ImageController {
 
   /**
    * Constructs an ImageController with the specified services and view.
+   * This allows guest users to process images without persisting results.
    * 
    * @param analyzerService the service for analyzing images
    * @param view the view for displaying results
@@ -47,12 +48,38 @@ public class ImageController {
       throw new IllegalArgumentException("View cannot be null");
     }
     this.analyzerService = analyzerService;
-    this.storageService = null; // Optional for simple processing
+    this.storageService = null;
     this.view = view;
   }
 
   /**
-   * Constructs an ImageController with the specified services (backward compatibility).
+   * Constructs an ImageController with analyzer, view, and storage service.
+   * This allows registered users to have their results persisted.
+   * 
+   * @param analyzerService the service for analyzing images
+   * @param storageService the service for storing and retrieving results
+   * @param view the view for displaying results
+   * @throws IllegalArgumentException if any parameter is null
+   */
+  public ImageController(ImageAnalyzerService analyzerService, FileStorageService storageService, View view) {
+    if (analyzerService == null) {
+      throw new IllegalArgumentException("Analyzer service cannot be null");
+    }
+    if (storageService == null) {
+      throw new IllegalArgumentException("Storage service cannot be null");
+    }
+    if (view == null) {
+      throw new IllegalArgumentException("View cannot be null");
+    }
+    this.analyzerService = analyzerService;
+    this.storageService = storageService;
+    this.view = view;
+  }
+
+  /**
+   * Constructs an ImageController with the specified analyzer and storage services.
+   * This constructor allows creating a controller without specifying a view,
+   * which may be required for legacy code or non-interactive terminal usage.
    * 
    * @param analyzerService the service for analyzing images
    * @param storageService the service for storing and retrieving results
@@ -108,7 +135,7 @@ public class ImageController {
   /**
    * Retrieves a detection result by image ID.
    * 
-   * @param imageId the unique ID of the image (must not be null or empty)
+   * @param imageId the unique ID of the image
    * @return an Optional containing the DetectionResult if found, empty otherwise
    * @throws IllegalArgumentException if imageId is null or empty
    * @throws IllegalStateException if storage service is not available
@@ -126,7 +153,7 @@ public class ImageController {
   /**
    * Lists all detection results for a user.
    * 
-   * @param user the user to retrieve results for (must not be null)
+   * @param user the user to retrieve results for
    * @return a list of DetectionResult objects for the user, empty list if none found
    * @throws IllegalArgumentException if user is null
    * @throws IllegalStateException if storage service is not available
@@ -151,9 +178,6 @@ public class ImageController {
    *   <li>Displays the result using the configured view</li>
    * </ol>
    * 
-   * <p>Note: Results are not persisted when using this method. Use
-   * uploadAndAnalyzeImage() with a registered user and storage service for persistence.
-   * 
    * @param filePath the path to the image file (must not be null or empty)
    * @throws IllegalArgumentException if filePath is null or empty
    * @throws IllegalStateException if view is not available
@@ -173,5 +197,85 @@ public class ImageController {
     DetectionResult result = analyzerService.detect(image);
     // Display result using the view
     view.display(result);
+  }
+
+  /**
+   * Processes an image file for a specific user: analyzes it, saves it (if registered),
+   * and displays the results.
+   * 
+   * <p>This method:
+   * <ol>
+   *   <li>Analyzes the image</li>
+   *   <li>Saves the result to storage if user is registered and storage is available</li>
+   *   <li>Displays the result using the configured view</li>
+   * </ol>
+   * 
+   * @param user the user processing the image (must not be null)
+   * @param filePath the path to the image file (must not be null or empty)
+   * @param description optional description of the image
+   * @return the DetectionResult containing detected labels
+   * @throws IllegalArgumentException if user is null, or filePath is null/empty
+   * @throws IllegalStateException if view is not available
+   */
+  public DetectionResult processForUser(User user, String filePath, String description) {
+    if (user == null) {
+      throw new IllegalArgumentException("User cannot be null");
+    }
+    if (filePath == null || filePath.trim().isEmpty()) {
+      throw new IllegalArgumentException("File path cannot be null or empty");
+    }
+    if (view == null) {
+      throw new IllegalStateException("View is not available");
+    }
+    
+    // Upload and analyze the image
+    DetectionResult result = uploadAndAnalyzeImage(user, filePath.trim(), description);
+    
+    // Display result using the view
+    view.display(result);
+    
+    // Show persistence status
+    if (user.isRegistered() && storageService != null) {
+      System.out.println("\n✓ Result saved to database for registered user.");
+    } else if (!user.isRegistered()) {
+      System.out.println("\n⚠ Result not saved (guest user). Register to save your results.");
+    }
+    
+    return result;
+  }
+
+  /**
+   * Displays all saved results for a user.
+   * 
+   * @param user the user to retrieve results for
+   * @throws IllegalArgumentException if user is null
+   * @throws IllegalStateException if storage service is not available
+   */
+  public void displayUserHistory(User user) {
+    if (user == null) {
+      throw new IllegalArgumentException("User cannot be null");
+    }
+    if (storageService == null) {
+      throw new IllegalStateException("Storage service is not available");
+    }
+    
+    List<DetectionResult> results = listUserResults(user);
+    
+    if (results.isEmpty()) {
+      System.out.println("\nNo saved results found for " + user.getUsername() + ".");
+    } else {
+      System.out.println("\n=== Saved Results for " + user.getUsername() + " ===");
+      System.out.println("Total results: " + results.size());
+      for (int i = 0; i < results.size(); i++) {
+        DetectionResult result = results.get(i);
+        System.out.println("\n[" + (i + 1) + "] Image: " + result.getImage().getStoragePath());
+        System.out.println("    Detected at: " + result.getDetectedAt());
+        System.out.println("    Labels: " + result.getLabels().size());
+        if (view != null) {
+          System.out.println("    Top label: " + 
+              (result.getTopLabel() != null ? result.getTopLabel().getName() : "None"));
+        }
+      }
+    }
   }
 }
