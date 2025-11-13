@@ -28,7 +28,7 @@ public class SwingView implements View {
     public void display(DetectionResult result) {
         JFrame frame = new JFrame("VisionTagger Detection Result");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 500);
+        frame.setSize(600, 600);
         frame.setLayout(new BorderLayout());
 
         // Image Panel
@@ -53,8 +53,8 @@ public class SwingView implements View {
         textArea.setText(sb.toString());
 
         // Layout
-        frame.add(imageLabel, BorderLayout.CENTER);
-        frame.add(new JScrollPane(textArea), BorderLayout.SOUTH);
+        frame.add(imageLabel, BorderLayout.NORTH);
+        frame.add(new JScrollPane(textArea), BorderLayout.CENTER);
 
         frame.setVisible(true);
     }
