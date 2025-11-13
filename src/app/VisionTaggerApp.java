@@ -62,7 +62,8 @@ public class VisionTaggerApp {
 
     // Parse command-line arguments
     if (args.length > 0) {
-      switch (args[0]) {
+      String firstArg = args[0];
+      switch (firstArg) {
         case "--json":
           view = new JsonView();
           if (args.length > 1) filePath = args[1];
@@ -93,10 +94,10 @@ public class VisionTaggerApp {
     } else {
       // Quick mode: process file directly (guest user, no storage)
       if (filePath == null) {
-        @SuppressWarnings("resource")
-        Scanner input = new Scanner(System.in);
-        System.out.print("Enter image file path: ");
-        filePath = input.nextLine();
+        System.err.println("Error: No file path provided.");
+        System.err.println("Usage: java VisionTaggerApp [--json|--gui|--gui-pro] <filepath>");
+        System.err.println("   or: java VisionTaggerApp <filepath>  (for console view)");
+        System.exit(1);
       }
       // Use simple process for quick mode (no user management)
       ImageController quickController = new ImageController(analyzer, view);
