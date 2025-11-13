@@ -30,13 +30,11 @@ VisionTagger/
 │   ├── app/
 │   │   └── VisionTaggerApp.java          # Main application entry point
 │   ├── controller/
-│   │   ├── ImageController.java          # Image processing controller
-│   │   └── SearchController.java         # Search functionality (placeholder)
+│   │   └── ImageController.java          # Image processing controller
 │   ├── model/
 │   │   ├── DetectionResult.java          # Detection result model
 │   │   ├── Image.java                    # Image model
 │   │   ├── Label.java                    # Label model
-│   │   ├── Product.java                  # Product model (placeholder)
 │   │   └── User.java                     # User model
 │   ├── service/
 │   │   ├── FileStorageService.java       # Storage interface
@@ -45,8 +43,7 @@ VisionTagger/
 │   │   ├── InMemoryUserRepository.java  # In-memory user repository
 │   │   ├── MockRekognitionService.java  # Mock image analyzer (for testing)
 │   │   ├── UserRepository.java          # User repository interface
-│   │   ├── UserService.java             # User management service
-│   │   └── ...                          # Other service implementations
+│   │   └── UserService.java             # User management service
 │   └── view/
 │       ├── View.java                     # View interface
 │       ├── ConsoleView.java             # Console output view
@@ -276,7 +273,6 @@ Test files are located in the `test/` directory. Run tests using your preferred 
 - [ ] AWS DynamoDB persistence
 - [ ] AWS S3 storage
 - [ ] Search functionality
-- [ ] Product recognition
 - [ ] Batch image processing
 - [ ] Export results to various formats
 
