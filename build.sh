@@ -89,7 +89,8 @@ usage() {
     echo "  $0 build                    # Compile the project"
     echo "  $0 run seaotter.jpg         # Run with console view"
     echo "  $0 run --json seaotter.jpg  # Run with JSON view"
-    echo "  $0 run --gui seaotter.jpg   # Run with GUI view"
+    echo "  $0 run --gui seaotter.jpg   # Run with simple GUI view"
+    echo "  $0 run --gui-pro seaotter.jpg  # Run with enhanced Pro GUI view"
     echo "  $0 clean                    # Clean build directory"
     echo ""
 }

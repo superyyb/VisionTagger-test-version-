@@ -11,7 +11,8 @@ VisionTagger is an image recognition application that allows users to upload ima
 - **Multiple View Modes**:
   - **Console View**: Human-readable text output
   - **JSON View**: Structured JSON output for programmatic consumption
-  - **GUI View**: Graphical user interface using Java Swing
+  - **GUI View**: Simple graphical user interface using Java Swing
+  - **GUI Pro View**: Enhanced graphical interface with modern styling, card layouts, and visual confidence indicators
 - **User Management**: Registration, login, and user switching
 - **Result History**: View all saved results for registered users
 - **Database Operations**: In-memory storage for registered users' results
@@ -50,7 +51,8 @@ VisionTagger/
 │       ├── View.java                     # View interface
 │       ├── ConsoleView.java             # Console output view
 │       ├── JsonView.java                # JSON output view
-│       ├── SwingView.java               # GUI view
+│       ├── SwingView.java               # Simple GUI view
+│       ├── SwingViewPro.java            # Enhanced Pro GUI view
 │       └── UserManagementView.java      # User management interface
 ├── test/                                # Test files
 ├── out/                                 # Compiled output directory
@@ -94,8 +96,11 @@ javac -d out/production/VisionTagger -sourcepath src $(find src -name "*.java")
 # JSON output
 ./build.sh run --json seaotter.jpg
 
-# GUI mode
+# GUI mode (simple)
 ./build.sh run --gui seaotter.jpg
+
+# GUI Pro mode (enhanced)
+./build.sh run --gui-pro seaotter.jpg
 ```
 
 ### Manual Execution
@@ -110,6 +115,7 @@ java -cp out/production/VisionTagger app.VisionTaggerApp seaotter.jpg
 # With view options
 java -cp out/production/VisionTagger app.VisionTaggerApp --json seaotter.jpg
 java -cp out/production/VisionTagger app.VisionTaggerApp --gui seaotter.jpg
+java -cp out/production/VisionTagger app.VisionTaggerApp --gui-pro seaotter.jpg
 ```
 
 ## Usage Guide
@@ -158,8 +164,11 @@ java -cp out/production/VisionTagger app.VisionTaggerApp image.jpg
 # JSON output
 java -cp out/production/VisionTagger app.VisionTaggerApp --json image.jpg
 
-# GUI output
+# GUI output (simple)
 java -cp out/production/VisionTagger app.VisionTaggerApp --gui image.jpg
+
+# GUI Pro output (enhanced)
+java -cp out/production/VisionTagger app.VisionTaggerApp --gui-pro image.jpg
 ```
 
 ## Command-Line Options
@@ -167,7 +176,8 @@ java -cp out/production/VisionTagger app.VisionTaggerApp --gui image.jpg
 | Option | Description |
 |--------|-------------|
 | `--json` | Output results in JSON format |
-| `--gui` | Display results in a graphical window |
+| `--gui` | Display results in a simple graphical window |
+| `--gui-pro` | Display results in an enhanced Pro graphical window with modern styling |
 | `<filepath>` | Image file to analyze |
 | (no args) | Enter interactive mode with user management |
 
@@ -209,12 +219,24 @@ Output:
 }
 ```
 
+### Example 4: Enhanced Pro GUI
+
+```bash
+./build.sh run --gui-pro seaotter.jpg
+```
+
+Opens a modern graphical window with:
+- Card-based label display
+- Visual confidence indicators with progress bars
+- Color-coded confidence levels
+- Rounded corners and modern styling
+
 ## Architecture
 
 ### MVC Pattern
 
 - **Model**: `Image`, `User`, `DetectionResult`, `Label` - Data models
-- **View**: `ConsoleView`, `JsonView`, `SwingView` - Presentation layer
+- **View**: `ConsoleView`, `JsonView`, `SwingView`, `SwingViewPro` - Presentation layer
 - **Controller**: `ImageController` - Business logic coordination
 
 ### Service Layer
