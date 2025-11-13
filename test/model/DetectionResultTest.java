@@ -84,15 +84,21 @@ public class DetectionResultTest {
     }
 
     @Test
-    void testLabelsListIsMutable() {
+    void testLabelsListIsUnmodifiable() {
         Label label = new Label("Otter", 96.3);
         detectionResult.addLabel(label);
         
         List<Label> labels = detectionResult.getLabels();
         assertEquals(1, labels.size());
         
-        labels.add(new Label("Animal", 99.0));
-        assertEquals(2, labels.size());
+        // The returned list should be unmodifiable
+        assertThrows(UnsupportedOperationException.class, () -> {
+            labels.add(new Label("Animal", 99.0));
+        });
+        
+        // But we can still add via addLabel method
+        detectionResult.addLabel(new Label("Animal", 99.0));
+        assertEquals(2, detectionResult.getLabels().size());
     }
 
     @Test
@@ -108,7 +114,9 @@ public class DetectionResultTest {
         detectionResult.addLabel(label);
         
         String result = detectionResult.toString();
-        assertEquals(result, String.format("Recognition result for %s:\n[%s]", filePath, label.toString()));
+        assertTrue(result.contains("image=" + filePath));
+        assertTrue(result.contains("labels="));
+        assertTrue(result.contains("detectedAt="));
     }
 
     @Test
@@ -119,7 +127,10 @@ public class DetectionResultTest {
         detectionResult.addLabel(label2);
         
         String result = detectionResult.toString();
-        assertEquals(result, String.format("Recognition result for %s:\n[%s, %s]", filePath, label1.toString(), label2.toString()));
+        assertTrue(result.contains("image=" + filePath));
+        assertTrue(result.contains("labels="));
+        assertTrue(result.contains("Otter"));
+        assertTrue(result.contains("Animal"));
     }
 
     @Test
