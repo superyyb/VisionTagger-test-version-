@@ -106,6 +106,6 @@ public class ImageTest {
     void testToString() {
         String result = image.toString();
         assertTrue(result.contains("uploaderId=" + user.getId()));
-        assertTrue(result.contains("filePath=" + filePath));
+        assertTrue(result.contains("storagePath=" + filePath));
     }
 }
