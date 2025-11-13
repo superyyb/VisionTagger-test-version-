@@ -28,7 +28,7 @@ public class ImageTest {
     void testConstructorWithAllFields() {
         assertNotNull(image);
         assertEquals(user.getId(), image.getUploaderId());
-        assertEquals(filePath, image.getFilePath());
+        assertEquals(filePath, image.getStoragePath());
         assertEquals(description, image.getDescription());
         assertNotNull(image.getId());
         assertNotNull(image.getUploadedAt());
@@ -39,7 +39,7 @@ public class ImageTest {
         Image img = new Image(user.getId(), filePath);
         assertEquals("", img.getDescription());
         assertEquals(user.getId(), img.getUploaderId());
-        assertEquals(filePath, img.getFilePath());
+        assertEquals(filePath, img.getStoragePath());
     }
 
     @Test
@@ -78,7 +78,7 @@ public class ImageTest {
     @Test
     void testGetters() {
         assertEquals(user.getId(), image.getUploaderId());
-        assertEquals(filePath, image.getFilePath());
+        assertEquals(filePath, image.getStoragePath());
         assertEquals(description, image.getDescription());
         assertNotNull(image.getId());
         assertNotNull(image.getUploadedAt());

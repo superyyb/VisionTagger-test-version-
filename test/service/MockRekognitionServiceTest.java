@@ -61,7 +61,7 @@ public class MockRekognitionServiceTest {
 
         assertEquals(image, result.getImage(), "Result should contain the input image");
         assertEquals(image.getId(), result.getImage().getId());
-        assertEquals(image.getFilePath(), result.getImage().getFilePath());
+        assertEquals(image.getStoragePath(), result.getImage().getStoragePath());
     }
 
     @Test
