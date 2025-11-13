@@ -8,6 +8,7 @@ import service.*;
 import view.ConsoleView;
 import view.JsonView;
 import view.SwingView;
+import view.SwingViewPro;
 import view.View;
 import view.UserManagementView;
 
@@ -29,7 +30,8 @@ import view.UserManagementView;
  * <p>Command-line usage:
  * <ul>
  *   <li>{@code java VisionTaggerApp --json &lt;filepath&gt;} - Output results as JSON</li>
- *   <li>{@code java VisionTaggerApp --gui &lt;filepath&gt;} - Display results in GUI window</li>
+ *   <li>{@code java VisionTaggerApp --gui &lt;filepath&gt;} - Display results in simple GUI window</li>
+ *   <li>{@code java VisionTaggerApp --gui-pro &lt;filepath&gt;} - Display results in enhanced Pro GUI window</li>
  *   <li>{@code java VisionTaggerApp &lt;filepath&gt;} - Display results in console (default)</li>
  *   <li>{@code java VisionTaggerApp} - Interactive mode with user management</li>
  * </ul>
@@ -45,7 +47,7 @@ public class VisionTaggerApp {
    * In production, these would be replaced with real implementations (e.g., DynamoDB,
    * S3, AWS Rekognition).
    * 
-   * @param args command-line arguments: optional view flag (--json or --gui) and file path
+   * @param args command-line arguments: optional view flag (--json, --gui, or --gui-pro) and file path
    */
   public static void main(String[] args) {
     // Initialize services
@@ -67,6 +69,10 @@ public class VisionTaggerApp {
           break;
         case "--gui":
           view = new SwingView();
+          if (args.length > 1) filePath = args[1];
+          break;
+        case "--gui-pro":
+          view = new SwingViewPro();
           if (args.length > 1) filePath = args[1];
           break;
         default:
