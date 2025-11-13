@@ -26,7 +26,7 @@ public class SwingView implements View {
 
     @Override
     public void display(DetectionResult result) {
-        JFrame frame = new JFrame("VisionTagger Detection Result");
+        JFrame frame = new JFrame("VisionTagger - Detection Results");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 600);
         frame.setLayout(new BorderLayout());
@@ -36,10 +36,22 @@ public class SwingView implements View {
         JLabel imageLabel = new JLabel();
         if (imgFile.exists()) {
             ImageIcon icon = new ImageIcon(imgFile.getPath());
-            Image scaled = icon.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+            // Scale image to fit width while maintaining aspect ratio
+            int maxWidth = 580;
+            int maxHeight = 300;
+            Image originalImage = icon.getImage();
+            int originalWidth = icon.getIconWidth();
+            int originalHeight = icon.getIconHeight();
+            
+            // Calculate scale to fit within max dimensions
+            double scale = Math.min((double) maxWidth / originalWidth, (double) maxHeight / originalHeight);
+            int scaledWidth = (int) (originalWidth * scale);
+            int scaledHeight = (int) (originalHeight * scale);
+            
+            Image scaled = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
             imageLabel.setIcon(new ImageIcon(scaled));
         } else {
-            imageLabel.setText("Image not found: " + result.getImage().getStoragePath());
+            imageLabel.setText("Image currently not available: " + result.getImage().getStoragePath());
         }
         
 
@@ -52,7 +64,7 @@ public class SwingView implements View {
         }
         textArea.setText(sb.toString());
 
-        // Layout
+        // Layout: Image at top (NORTH), Labels at bottom (CENTER takes remaining space)
         frame.add(imageLabel, BorderLayout.NORTH);
         frame.add(new JScrollPane(textArea), BorderLayout.CENTER);
 

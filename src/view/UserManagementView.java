@@ -58,7 +58,7 @@ public class UserManagementView {
       case "4":
         System.out.println("Exiting...");
         System.exit(0);
-        break;
+        return null;
       default:
         System.out.println("Invalid choice. Continuing as guest...");
         return handleGuestUser();
