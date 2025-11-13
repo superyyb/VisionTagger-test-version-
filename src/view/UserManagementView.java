@@ -43,7 +43,8 @@ public class UserManagementView {
     System.out.println("1. Continue as Guest");
     System.out.println("2. Register New User");
     System.out.println("3. Login");
-    System.out.print("Choose an option (1-3): ");
+    System.out.println("4. Exit");
+    System.out.print("Choose an option (1-4): ");
     
     String choice = scanner.nextLine().trim();
     
@@ -54,6 +55,10 @@ public class UserManagementView {
         return handleRegistration();
       case "3":
         return handleLogin();
+      case "4":
+        System.out.println("Exiting...");
+        System.exit(0);
+        break;
       default:
         System.out.println("Invalid choice. Continuing as guest...");
         return handleGuestUser();
