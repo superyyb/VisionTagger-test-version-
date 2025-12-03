@@ -202,14 +202,14 @@ public class ImageController {
   /**
    * Processes an image file for a specific user: analyzes it, saves it (if registered),
    * and displays the results.
-   * 
+   *
    * <p>This method:
    * <ol>
    *   <li>Analyzes the image</li>
    *   <li>Saves the result to storage if user is registered and storage is available</li>
    *   <li>Displays the result using the configured view</li>
    * </ol>
-   * 
+   *
    * @param user the user processing the image (must not be null)
    * @param filePath the path to the image file (must not be null or empty)
    * @param description optional description of the image
@@ -227,20 +227,27 @@ public class ImageController {
     if (view == null) {
       throw new IllegalStateException("View is not available");
     }
-    
-    // Upload and analyze the image
-    DetectionResult result = uploadAndAnalyzeImage(user, filePath.trim(), description);
-    
+
+    // Create image object with user ID, file path, and optional description
+    Image image = new Image(user.getId(), filePath.trim(), description);
+    // Analyze image to detect labels
+    DetectionResult result = analyzerService.detect(image);
+
+    // Only save result for registered users (even if storage service is available)
+    if (user.isRegistered() && storageService != null) {
+      storageService.save(result);
+    }
+
     // Display result using the view
     view.display(result);
-    
+
     // Show persistence status
     if (user.isRegistered() && storageService != null) {
       System.out.println("\n✓ Result saved to database for registered user.");
     } else if (!user.isRegistered()) {
       System.out.println("\n⚠ Result not saved (guest user). Register to save your results.");
     }
-    
+
     return result;
   }
 
