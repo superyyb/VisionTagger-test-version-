@@ -1,0 +1,44 @@
+Part 2.Winston Video
+After watching Winston’s video, I identified five specific techniques that I will apply in
+presenting our VisionTagger Final Project.
+
+(1) Begin with an Empowerment Promise (Winston’s “Promise” Principle)
+Winston emphasizes starting with an empowerment promise — telling the audience what they will
+learn or be able to do by the end of the talk. This creates motivation and primes them to listen
+with purpose.
+At the start of my VisionTagger presentation, I will briefly promise the audience that by the end
+they will clearly understand how VisionTagger analyzes images and how the MVC + Service Layer
+architecture enables extensibility.
+
+
+(2) Use Verbal Punctuation to Structure the Talk Clearly
+Winston recommends using “verbal punctuation” — explicit structural markers like first, next, finally
+— so listeners never get lost, even if they miss a part of the talk.
+When presenting the system architecture, I will explicitly break it into three main segments:
+Model and immutable data structures
+Service layer and controller orchestration
+View implementations (Console, JSON, Swing, SwingPro)
+Each transition will be clearly signposted so the audience can follow the design flow without confusion.
+
+(3) Cycle Key Ideas
+Winston stresses the importance of cycling — repeating essential points at least three times in
+different ways so the audience retains them.
+The message I will cycle is:
+“VisionTagger is architected for extensibility through interfaces and clean separation of concerns.”
+This helps ensure the core concept stays memorable.
+
+(4) Use Diagrams Instead of Dense Text (Slides Support the Speaker, Not Replace Them)
+Winston warns against putting too much text on slides; the audience cannot read and listen
+simultaneously. Slides should amplify the speaker.
+For the class diagram and architecture, I will avoid copying large blocks of text from Part 1.
+Instead, I will show:
+a simplified class diagram with arrows illustrating flow between Controller → Service Layer → View
+highlight colors for interfaces vs. implementations, which allows me to verbally explain the logic.
+
+(5) Fence the Idea — Clarify What the Project Is and Is Not
+Winston teaches the technique of “fencing”: draw clear boundaries so the audience does not confuse
+your idea with something else.
+Early in the presentation, I will define VisionTagger by stating both what it is and is not:
+VisionTagger is a modular image‐labeling system that supports multiple views and a pluggable
+analysis engine, and it is not a full machine-learning model; the analyzer is intentionally
+abstracted so any implementation (mock, AWS, local ML) can be plugged in.

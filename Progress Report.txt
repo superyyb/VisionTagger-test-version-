@@ -1,0 +1,236 @@
+Part 1. Progress Report (55 points, 11 per item below)
+
+(a) Brief summary of the project
+VisionTagger is a Java-based image recognition system that allows users to upload an image
+and receive a set of automatically generated labels with confidence scores.
+The analyzer can be a mock module or, later, replaced by a real API such as AWS Rekognition.
+Results can be viewed in multiple formats (console, JSON, or GUI).
+The app supports guest users for quick image analysis and registered users for past results
+storage and retrieval.
+The project uses a MVC architecture with a Service layer (Model–View–Service–Controller)
+so that data, business logic, and presentation remain cleanly separated and easy to extend.
+
+
+(b) Object-oriented design elements shown in the project
+The project demonstrates the following object-oriented design elements:
+
+- Design Patterns:
+    Model-View-Controller (MVC): Architectural pattern separating data, presentation, and logic
+    Strategy Pattern: Interchangeable View implementations selected at runtime
+    Factory Method Pattern: User creation through factory methods with encapsulated logic
+    Repository Pattern: Data access abstraction via UserRepository and FileStorageService
+    Service Layer Pattern: Business logic encapsulated in dedicated service classes
+
+- SOLID Principles:
+    Single Responsibility: Each class has one clear purpose
+    Open/Closed: Extensible through interfaces without modifying existing code
+    Liskov Substitution: All interface implementations are fully interchangeable
+    Interface Segregation: Small, focused interfaces with minimal methods
+    Dependency Inversion: High-level classes depend on abstractions, not concrete implementations
+
+- Core OOP Concepts:
+    Encapsulation: Private fields, immutable models, defensive copying
+    Abstraction: Interfaces defining contracts, hiding implementation details
+    Polymorphism: Runtime behavior variation through interface implementations
+    Composition over Inheritance: Delegation preferred over class hierarchies
+
+- Additional Practices:
+    Immutable value objects (all models declared final)
+    Dependency injection via constructors
+    Layered architecture with clear separation of concerns
+    Interface-first design enabling testability and flexibility
+
+
+(c) Instructional team consulted
+We discussed this version with Prof. Mark.
+
+
+(d) Feasibility confirmation
+Yes, approved.
+
+
+(e) A rough sketch of a Class Diagram
+                          ┌──────────────────────────────┐
+                          │        VisionTaggerApp       │
+                          │  (application entry point)   │
+                          └───────────────┬──────────────┘
+                                          │
+                                          ▼  creates & wires
+                          ┌─────────────────────────────────┐
+                          │        ImageController          │
+                          │  (image processing controller)  │
+                          └──────┬──────────┬──────────┬────┘
+                                 │          │          │
+                                 │delegates │delegates │delegates
+                                 ▼          ▼          ▼
+                     ┌────────────────┐  ┌─────────────────┐  ┌───────────────┐
+                     │ ImageAnalyzer  │  │ FileStorage     │  │   UserService │
+                     │  Service       │  │   Service       │  │ (concrete)    │
+                     │ (interface)    │  │ (interface)     │  └───────┬───────┘
+                     └───────┬────────┘  └──────┬──────────┘          │
+                             │                  │                     │delegates
+                             │implements        │implements           │
+                             ▼                  ▼                     ▼
+              ┌────────────────────────┐   ┌──────────────────────┐   ┌──────────────────┐
+              │ MockRekognitionService │   │ InMemoryFileStorage  │   │  UserRepository  │
+              │     (implementation)   │   │      Service         │   │   (interface)    │
+              └────────────────────────┘   └──────────────────────┘   └────────┬─────────┘
+                                                                               │
+                                                                               │implements
+                                                                               ▼
+                                                                    ┌──────────────────────────┐
+                                                                    │ InMemoryUserRepository   │
+                                                                    │     (implementation)     │
+                                                                    └──────────────────────────┘
+
+
+
+                             ┌────────────────────────────────────────────┐
+                             │               View (interface)             │
+                             └──────────┬──────────────┬──────────────────┘
+                                        │              │
+                                        │implements    │implements
+                                        ▼              ▼
+                          ┌──────────────────────┐   ┌──────────────────────┐
+                          │     ConsoleView      │   │       JsonView       │
+                          │   (implementation)   │   │   (implementation)   │
+                          └──────────────────────┘   └──────────────────────┘
+                                        │              │
+                                        │implements    │implements
+                                        ▼              ▼
+                          ┌──────────────────────┐   ┌──────────────────────┐
+                          │      SwingView       │   │    SwingViewPro      │
+                          │   (implementation)   │   │   (implementation)   │
+                          └──────────────────────┘   └──────────────────────┘
+
+
+
+                         ┌────────────────────────────────────────────┐
+                         │                  MODEL                     │
+                         │           (all classes final)              │
+                         └──────────────────────────────────────┬─────┘
+                                                                │
+                         ┌──────────────────────────────────────┘
+                         │
+                         ├──► ┌──────────────────────────┐
+                         │    │          User            │
+                         │    │  + Type enum: GUEST,     │
+                         │    │    REGISTERED            │
+                         │    └──────────────────────────┘
+                         │
+                         ├──► ┌──────────────────────────┐
+                         │    │          Image           │
+                         │    │  (metadata)              │
+                         │    └──────────────────────────┘
+                         │
+                         ├──► ┌──────────────────────────┐
+                         │    │      DetectionResult     │
+                         │    │  - Image                 │
+                         │    │  - List<Label>           │
+                         │    └──────────────────────────┘
+                         │
+                         └──► ┌──────────────────────────┐
+                              │          Label           │
+                              │  - name: String          │
+                              │  - confidence: double    │
+                              └──────────────────────────┘
+
+
+(f) The final list of team members
+Mingkai Gao, Ni Li, Yue Chen
+
+
+(g) Estimated number of lines of Java code
+Source code: ~2000 lines
+Test code:   ~1600 lines
+
+
+(h) Number of files (not counting slides)
+Around 35 files in total:
+    - Java source files (19):
+        1 app entry point (VisionTaggerApp.java)
+        1 controller (ImageController.java)
+        4 model classes (DetectionResult.java, Image.java, Label.java, User.java)
+        7 service files (3 interfaces + 4 implementations)
+        6 view files (1 interface + 5 implementations including UserManagementView)
+    - Java test files (14)
+    - Build and configuration files (2):
+        build.sh (build script)
+        README.md (documentation)
+
+
+(i) Estimated non-Java lines
+Around 400 lines, including:
+    - README.md documentation
+    - build.sh build script
+
+
+(j) Planned use of AI-generated code
+Around 400 lines(15% of overall base codes), mainly for:
+    - SwingViewPro.java for an enhanced GUI view
+    - build.sh automated build and compilation script
+
+
+(k) OOD Principles visible in your code
+Our code demonstrates extensive use of object-oriented design principles:
+
+- SOLID Principles:
+1. Single Responsibility Principle
+ach class has one clear purpose: Label represents a detection label with confidence;
+ImageController orchestrates services; MockRekognitionService performs analysis;
+UserService manages user operations.
+
+2. Open/Closed Principle
+TThe system is open for extension but closed for modification. New views can be added by
+implementing the View interface without changing existing code. Service interfaces allow
+swapping implementations (e.g., replace MockRekognitionService with AwsRekognitionService)
+with zero changes to client code.
+
+3. Liskov Substitution Principle
+All implementations of an interface are fully interchangeable. Any View implementation can
+replace another; any FileStorageService or ImageAnalyzerService can be swapped transparently.
+
+4. Interface Segregation Principle
+We use small, focused interfaces: View has one method (display); ImageAnalyzerService has
+one method (detect); UserRepository has only essential CRUD operations.
+
+5. Dependency Inversion Principle
+High-level modules depend on abstractions, not concrete implementations.
+ImageController depends on ImageAnalyzerService interface (not MockRekognitionService);
+UserService depends on UserRepository interface (not InMemoryUserRepository).
+All dependencies are injected via constructors for testability and flexibility.
+
+
+- Additional OOD Principles:
+1. Encapsulation
+Data hiding with private fields and controlled public accessors
+Immutable model classes (User, Image, Label, DetectionResult) declared final with final fields,
+preventing unintended state changes and ensuring thread-safety.
+
+2. Abstraction
+Interfaces (View, ImageAnalyzerService, FileStorageService, UserRepository) define contracts
+and hide implementation details, enabling loose coupling: clients depend on interfaces,
+not concrete classes.
+
+3. Composition over Inheritance
+ImageController composes services via delegation rather than extending them.
+UserService delegates to UserRepository rather than inheriting.
+DetectionResult composes Image and List<Label>.
+
+4. Polymorphism
+Multiple View implementations provide different output formats at runtime.
+Multiple service implementations can be swapped without code changes.
+The same method call (view.display()) produces different behaviors based on actual type.
+
+5. Factory Method Pattern
+User.guestUser() and User.registeredUser() encapsulate complex object creation logic.
+Different ID generation strategies per user type.
+More semantic and safer than direct constructor calls.
+
+6. Separation of Concerns
+Clear layer boundaries: Models contain data/validation; Services contain business logic;
+Controller orchestrates workflows; Views handle presentation.
+
+7. Repository Pattern
+UserRepository and FileStorageService abstract data access,
+enabling swapping in-memory storage for real databases without changing business logic
