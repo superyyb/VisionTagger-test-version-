@@ -86,3 +86,9 @@ public class UserService {
   }
 }
 
+//public Optional<User> findByUsername(String username) {
+//  if (username == null || username.trim().isEmpty()) {
+//    throw new IllegalArgumentException("Username cannot be null or empty");
+//  }
+//  return userRepository.findByUsername(username.trim());
+//}

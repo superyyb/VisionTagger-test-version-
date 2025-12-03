@@ -39,6 +39,7 @@ import view.UserManagementView;
  * @author VisionTagger Team
  * @version 1.0
  */
+//--gui-pro /Users/you/Desktop/test.jpg
 public class VisionTaggerApp {
   /**
    * Main entry point for the VisionTagger application.

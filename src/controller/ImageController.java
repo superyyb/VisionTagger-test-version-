@@ -228,8 +228,15 @@ public class ImageController {
       throw new IllegalStateException("View is not available");
     }
     
-    // Upload and analyze the image
-    DetectionResult result = uploadAndAnalyzeImage(user, filePath.trim(), description);
+    // Create image object with user ID, file path, and optional description
+    Image image = new Image(user.getId(), filePath.trim(), description);
+    // Analyze image to detect labels
+    DetectionResult result = analyzerService.detect(image);
+    
+    // Only save result for registered users (even if storage service is available)
+    if (user.isRegistered() && storageService != null) {
+      storageService.save(result);
+    }
     
     // Display result using the view
     view.display(result);

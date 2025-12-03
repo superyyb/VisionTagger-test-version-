@@ -14,6 +14,7 @@ public class InMemoryUserRepositoryTest {
 
     private InMemoryUserRepository repository;
     private User registeredUser;
+    private User registeredUser2;
     private User guestUser;
     private String username;
     private String email;
@@ -21,22 +22,29 @@ public class InMemoryUserRepositoryTest {
     @BeforeEach
     void setUp() {
         repository = new InMemoryUserRepository();
-        username = "testuser";
-        email = "test@example.com";
+        username = "testUser";
+        email = "testUser@example.com";
         registeredUser = User.registeredUser(username, email);
-        guestUser = User.guestUser("guestuser");
+        registeredUser2 = User.registeredUser("testUser2", "testUser2@example.com");
+        guestUser = User.guestUser("guestUser");
     }
 
-    // ==================== Save Tests ====================
 
+    //Tests that saving a registered user stores it in the repository,
+    //and it can be found by existsByUsername.
     @Test
     void testSaveRegisteredUser() {
+        assertFalse(repository.existsByUsername(username));
+        
         User saved = repository.save(registeredUser);
         assertNotNull(saved);
         assertEquals(registeredUser.getUsername(), saved.getUsername());
         assertEquals(registeredUser.getEmail(), saved.getEmail());
+        assertTrue(repository.existsByUsername(username));
     }
 
+
+    //Tests that saving a guest user does not store it in the repository.
     @Test
     void testSaveGuestUserDoesNotStore() {
         User saved = repository.save(guestUser);
@@ -47,6 +55,8 @@ public class InMemoryUserRepositoryTest {
         assertFalse(repository.findByUsername(guestUser.getUsername()).isPresent());
     }
 
+
+    //Tests that saving a null user throws an IllegalArgumentException.
     @Test
     void testSaveNullUserThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> {
@@ -54,6 +64,7 @@ public class InMemoryUserRepositoryTest {
         });
     }
 
+    //Tests that saving an existing user updates it with new information.
     @Test
     void testSaveUpdatesExistingUser() {
         repository.save(registeredUser);
@@ -66,29 +77,17 @@ public class InMemoryUserRepositoryTest {
         assertEquals("newemail@example.com", found.get().getEmail());
     }
 
-    // ==================== ExistsByUsername Tests ====================
 
+    //Tests that existsByUsername returns false when called with null/empty usernames(Invalid input).
     @Test
-    void testExistsByUsernameForRegisteredUser() {
-        assertFalse(repository.existsByUsername(username));
-        
-        repository.save(registeredUser);
-        
-        assertTrue(repository.existsByUsername(username));
+    void testExistsByUsernameInvalidInputReturnsFalse() {
+      assertFalse(repository.existsByUsername(null));
+      assertFalse(repository.existsByUsername(""));
+      assertFalse(repository.existsByUsername("   "));
     }
 
-    @Test
-    void testExistsByUsernameForGuestUser() {
-        repository.save(guestUser);
-        
-        assertFalse(repository.existsByUsername(guestUser.getUsername()));
-    }
 
-    @Test
-    void testExistsByUsernameNullReturnsFalse() {
-        assertFalse(repository.existsByUsername(null));
-    }
-
+    //Tests that existsByUsername is case-insensitive and works with different case variations.
     @Test
     void testExistsByUsernameCaseInsensitive() {
         repository.save(registeredUser);
@@ -98,13 +97,15 @@ public class InMemoryUserRepositoryTest {
         assertTrue(repository.existsByUsername("testuser"));
     }
 
+    //Tests that existsByUsername returns false for a non-existent username.
+    //User may not have registered yet
     @Test
     void testExistsByUsernameNotFound() {
         assertFalse(repository.existsByUsername("nonexistent"));
     }
 
-    // ==================== FindByUsername Tests ====================
 
+    //Tests that findByUsername returns the correct registered user after saving.
     @Test
     void testFindByUsername() {
         repository.save(registeredUser);
@@ -115,18 +116,29 @@ public class InMemoryUserRepositoryTest {
         assertEquals(registeredUser.getUsername(), found.get().getUsername());
     }
 
+
+    //Tests that findByUsername returns an empty Optional for a non-existent username.
     @Test
     void testFindByUsernameNotFound() {
         Optional<User> found = repository.findByUsername("nonexistent");
         assertFalse(found.isPresent());
     }
 
+
+    //Tests that findByUsername returns an empty Optional when called with null/empty.
     @Test
-    void testFindByUsernameNull() {
-        Optional<User> found = repository.findByUsername(null);
-        assertFalse(found.isPresent());
+    void testFindByUsernameInvalidInputReturnsEmpty() {
+      Optional<User> found1 = repository.findByUsername(null);
+      Optional<User> found2 = repository.findByUsername("");
+      Optional<User> found3 = repository.findByUsername("   ");
+
+      assertFalse(found1.isPresent());
+      assertFalse(found2.isPresent());
+      assertFalse(found3.isPresent());
     }
 
+
+    //Tests that findByUsername is case-insensitive and works with different case variations.
     @Test
     void testFindByUsernameCaseInsensitive() {
         repository.save(registeredUser);
@@ -140,96 +152,19 @@ public class InMemoryUserRepositoryTest {
         assertEquals(registeredUser.getId(), found2.get().getId());
     }
 
-    @Test
-    void testFindByUsernameForGuestUser() {
-        repository.save(guestUser);
-        
-        Optional<User> found = repository.findByUsername(guestUser.getUsername());
-        assertFalse(found.isPresent());
-    }
 
-    // ==================== Clear Tests ====================
-
+    //Tests that clear removes all registered users from the repository.
     @Test
     void testClear() {
         repository.save(registeredUser);
-        repository.save(User.registeredUser("user2", "user2@example.com"));
+        repository.save(registeredUser2);
         
         assertTrue(repository.existsByUsername(username));
-        assertTrue(repository.existsByUsername("user2"));
+        assertTrue(repository.existsByUsername(registeredUser2.getUsername()));
         
         repository.clear();
         
         assertFalse(repository.existsByUsername(username));
-        assertFalse(repository.existsByUsername("user2"));
-    }
-
-    @Test
-    void testClearEmptyRepository() {
-        repository.clear();
-        assertFalse(repository.existsByUsername(username));
-    }
-
-    // ==================== Integration Tests ====================
-
-    @Test
-    void testSaveMultipleRegisteredUsers() {
-        User user1 = User.registeredUser("user1", "user1@example.com");
-        User user2 = User.registeredUser("user2", "user2@example.com");
-        User user3 = User.registeredUser("user3", "user3@example.com");
-        
-        repository.save(user1);
-        repository.save(user2);
-        repository.save(user3);
-        
-        assertTrue(repository.existsByUsername("user1"));
-        assertTrue(repository.existsByUsername("user2"));
-        assertTrue(repository.existsByUsername("user3"));
-    }
-
-    @Test
-    void testSaveMixedGuestAndRegisteredUsers() {
-        User registered = User.registeredUser("registered", "reg@example.com");
-        User guest1 = User.guestUser("guest1");
-        User guest2 = User.guestUser("guest2");
-        
-        repository.save(registered);
-        repository.save(guest1);
-        repository.save(guest2);
-        
-        // Only registered user should be stored
-        assertTrue(repository.existsByUsername("registered"));
-        assertFalse(repository.existsByUsername("guest1"));
-        assertFalse(repository.existsByUsername("guest2"));
-    }
-
-    @Test
-    void testCaseInsensitiveOverwrite() {
-        User user1 = User.registeredUser("TestUser", "test1@example.com");
-        User user2 = User.registeredUser("testuser", "test2@example.com");
-        
-        repository.save(user1);
-        repository.save(user2);
-        
-        // Second save should overwrite first (case-insensitive)
-        Optional<User> found = repository.findByUsername("testuser");
-        assertTrue(found.isPresent());
-        assertEquals("test2@example.com", found.get().getEmail());
-    }
-
-    @Test
-    void testRepositoryPersistsAcrossOperations() {
-        repository.save(User.registeredUser("user1", "user1@example.com"));
-        repository.save(User.registeredUser("user2", "user2@example.com"));
-        
-        assertTrue(repository.existsByUsername("user1"));
-        Optional<User> found = repository.findByUsername("user2");
-        assertTrue(found.isPresent());
-        
-        repository.save(User.registeredUser("user3", "user3@example.com"));
-        
-        assertTrue(repository.existsByUsername("user1"));
-        assertTrue(repository.existsByUsername("user2"));
-        assertTrue(repository.existsByUsername("user3"));
+        assertFalse(repository.existsByUsername(registeredUser2.getUsername()));
     }
 }

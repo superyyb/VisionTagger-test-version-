@@ -53,11 +53,11 @@ public class InMemoryFileStorageService implements FileStorageService {
             throw new IllegalArgumentException("Uploader ID cannot be null or empty");
         }
         
-        String imageId = result.getImage().getId().trim();
+        String imageId = result.getImage().getId().trim();//new result
         String userId = result.getImage().getUploaderId().trim();
         
         // Check if this is an update
-        DetectionResult existingResult = primaryTable.get(imageId);
+        DetectionResult existingResult = primaryTable.get(imageId);//old result
         boolean isUpdate = existingResult != null;
         
         // Update primary table
